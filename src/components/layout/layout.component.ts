@@ -12,8 +12,16 @@ export class Layout extends LitElement {
   render(): TemplateResult {
     return html`
       <section class="layout-container">
-        <navbar-component></navbar-component>
-        <p>Hello from layout container!</p>
+        <navbar-component class="header"></navbar-component>
+        <!-- <p>Hello from layout container!</p> -->
+        <section class="main-container">
+          <div class="game-container">
+            <game-component class="game"></game-component>
+          </div>
+        </section>
+        <section class="footer-container">
+         footer text 
+        </section>
       </section>
     `
   }
