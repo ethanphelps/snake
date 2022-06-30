@@ -37,6 +37,9 @@ export class GameEngine {
       this.player.move()
     }
 
+    // once position updated, enqueue new segment at player.x, player.y,
+    // check if previous position was on a food piece: if so, skip dequeue(). otherwise, dequeue()
+
 
     // ---- redraw stuff
     this.player.draw()
