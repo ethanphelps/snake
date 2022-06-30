@@ -1,30 +1,57 @@
-import { BLOCK_SIZE, MAP_SIZE } from "../../../config/constants";
+import { BLOCK_SIZE, MAP_SIZE, SNAKE_SPEED } from "../../../config/constants";
 import { FoodColor } from "../../../models/enums";
+import { SnakeGame } from "../game.component";
 import { Food } from "./food"; 
+import { Snake } from "./snake";
+
 
 export class GameEngine {
   food: Food[]
   canvas: HTMLCanvasElement
   context: CanvasRenderingContext2D 
+  player: Snake
+  lastestRenderTimestamp: number = 0
+
 
   constructor() {
     this.food = [] 
     this.canvas = this.getCanvas()
     this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D
 
-    this.createSnake()
+    this.player = this.createSnake(20, 10, FoodColor.green)
+    this.player.draw()
     this.createFood(4)
+
+    this.gameLoop(0)
   }
 
-  gameLoop() {
 
+  gameLoop(now: DOMHighResTimeStamp) {
+    //clear the canvas
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
+
+    // ----  other tasks
+    // update snake position every SNAKE_SPEED ms
+    if(!this.lastestRenderTimestamp || now - this.lastestRenderTimestamp >= SNAKE_SPEED) {
+      this.lastestRenderTimestamp = now
+      this.player.move()
+    }
+
+
+    // ---- redraw stuff
+    this.player.draw()
+    for(let i in this.food) {
+      this.food[i].draw() 
+    }
+
+    requestAnimationFrame(this.gameLoop.bind(this)) // bind 'this' keyword to GameEngine class
   }
 
-  createSnake() {
-    this.context.beginPath()
-    this.context.fillStyle = FoodColor.green
-    this.context.fillRect(20 * BLOCK_SIZE, 10 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
+
+  createSnake(x: number, y: number, color: FoodColor) {
+    return new Snake(x, y, color, this.context)
   }
+
 
   /**
    * 
@@ -37,12 +64,14 @@ export class GameEngine {
     return canvas 
   }
 
+
   createFood(count: number) {
     for(let i = 0; i < count; i++) {
       let food = new Food(this.randomMapLocation(), this.randomMapLocation(), this.context)
-      food.draw()
+      this.food.push(food)
     }
   }
+
 
   randomMapLocation(): number {
     let random =  Math.floor(Math.random() * MAP_SIZE)

@@ -7,6 +7,7 @@ export class Food {
   color: FoodColor
   c: CanvasRenderingContext2D
 
+
   constructor(x: number, y: number, context: CanvasRenderingContext2D) {
     this.x = x
     this.y = y
@@ -18,11 +19,13 @@ export class Food {
     console.log(this.color)
   }
 
+
   draw() {
     this.c.beginPath()
     this.c.fillStyle = this.color 
     this.c.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE)
   }
+
 
   /**
    *  
