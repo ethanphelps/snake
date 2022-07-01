@@ -10,7 +10,7 @@ export class Player extends Snake {
   // color: string
   // context: CanvasRenderingContext2D
   direction: DirectionVector = Directions.Up
-  tail: Position[]
+  // body: Position[]
 
   constructor(x: number, y: number, color: string, context: CanvasRenderingContext2D) {
     super(x, y, color, context)
@@ -18,7 +18,7 @@ export class Player extends Snake {
     // this.y = y
     // this.color = color
     // this.context = context
-    this.tail = [ {x: this.x, y: this.y }] // tail is a "queue" data structure - enqueueing most recent element to front and dequeueing from end (unless food just eaten)
+    this.body = [ {x: this.x, y: this.y }] // tail is a "queue" data structure - enqueueing most recent element to front and dequeueing from end (unless food just eaten)
 
     document.addEventListener('keydown', this.changeDirection.bind(this))
   }

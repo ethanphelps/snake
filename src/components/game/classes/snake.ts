@@ -19,8 +19,8 @@ export class Snake {
   context: CanvasRenderingContext2D
   direction: DirectionVector = Directions.Up
   body: Position[]
-  head: number = 0
-  tail: number = 0
+  head: number = 0 // head is the 'front' of the queue where elements get dequeued, but is the back of snake
+  tail: number = 1 // counterintuitively, tail is one past the 'head' of the snake, but also the 'back' of the queue where new elements are added
 
   constructor(x: number, y: number, color: string, context: CanvasRenderingContext2D) {
     this.x = x
@@ -34,17 +34,32 @@ export class Snake {
 
 
   draw() {
-    this.context.beginPath()
-    this.context.fillStyle = FoodColor.green
-    this.context.fillRect(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
+    // this.context.beginPath()
+    // this.context.fillStyle = FoodColor.green
+    // this.context.fillRect(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
     
     // loop through body and draw each segment of the body
+    for(let element of this.body) {
+      this.context.beginPath()
+      this.context.fillStyle = FoodColor.green
+      this.context.fillRect(element.x * BLOCK_SIZE, element.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
+    }
   }
 
 
   enqueue(element: Position) {
     this.body[this.tail] = element
-    this.tail++
+    this.tail++ // moving tail marker forward in the array
+  }
+
+  
+  dequeue() {
+    // const element = this.body[this.head]
+    // this.body.splice(this.head, 1)
+    // this.head++ // moving head marker forward in the array
+    // this.body.shift()
+    this.body = this.body.slice(1)
+    console.log(this.body.length)
   }
 
 

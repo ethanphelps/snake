@@ -10,7 +10,7 @@ export class GameEngine {
   canvas: HTMLCanvasElement
   context: CanvasRenderingContext2D 
   player: Snake
-  lastestRenderTimestamp: number = 0
+  lastestRenderTimestamp: number = 1
 
 
   constructor() {
@@ -25,23 +25,39 @@ export class GameEngine {
     this.gameLoop(0)
   }
 
-
+  /**
+   * 
+   * @param now timestamp of the current time in this animation frame
+   */
   gameLoop(now: DOMHighResTimeStamp) {
-    //clear the canvas
+    //clear the canvas every frame
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
     // ----  other tasks
     // update snake position every SNAKE_SPEED ms
     if(!this.lastestRenderTimestamp || now - this.lastestRenderTimestamp >= SNAKE_SPEED) {
       this.lastestRenderTimestamp = now
+
+
+      // this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
+
       this.player.move()
+      console.log(this.player.body)
+
+      // once position updated, enqueue new segment at player.x, player.y,this
+      this.player.enqueue({ x: this.player.x, y: this.player.y})
+      // check if previous position was on a food piece: if so, skip dequeue(). otherwise, dequeue()
+      this.player.dequeue()
+
+
+      // this.player.draw()
+      // for(let i in this.food) {
+      //   this.food[i].draw() 
+      // }
     }
 
-    // once position updated, enqueue new segment at player.x, player.y,
-    // check if previous position was on a food piece: if so, skip dequeue(). otherwise, dequeue()
 
-
-    // ---- redraw stuff
+    // ---- redraw stuff every frame
     this.player.draw()
     for(let i in this.food) {
       this.food[i].draw() 
