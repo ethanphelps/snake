@@ -21,13 +21,14 @@ export class Snake {
   body: Position[]
   head: number = 0 // head is the 'front' of the queue where elements get dequeued, but is the back of snake
   tail: number = 1 // counterintuitively, tail is one past the 'head' of the snake, but also the 'back' of the queue where new elements are added
+  justAteFood: boolean = false
 
   constructor(x: number, y: number, color: string, context: CanvasRenderingContext2D) {
     this.x = x
     this.y = y
     this.color = color
     this.context = context
-    this.body = [ {x: this.x, y: this.y },{x: this.x, y: this.y + 1 } ] // body is a "queue" data structure - enqueueing most recent element to front and dequeueing from end (unless food just eaten)
+    this.body = [ {x: this.x, y: this.y }] // body is a "queue" data structure - enqueueing most recent element to front and dequeueing from end (unless food just eaten)
     this.tail = this.body.length
 
     document.addEventListener('keydown', this.changeDirection.bind(this))
@@ -51,7 +52,6 @@ export class Snake {
   
   dequeue() {
     this.body = this.body.slice(1)
-    console.log(this.body.length)
     this.tail-- // move tail marker back to be one past the snake's "head"
   }
 

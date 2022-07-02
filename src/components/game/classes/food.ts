@@ -13,17 +13,13 @@ export class Food {
     this.y = y
     this.color = this.randomColor() 
     this.c = context
-    // this.draw()
-    console.log(this.x)
-    console.log(this.y)
-    console.log(this.color)
   }
 
 
   draw() {
     this.c.beginPath()
     this.c.fillStyle = this.color 
-    this.c.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE)
+    this.c.fillRect(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
   }
 
 

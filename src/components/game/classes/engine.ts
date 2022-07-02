@@ -1,4 +1,4 @@
-import { BLOCK_SIZE, MAP_SIZE, SNAKE_SPEED } from "../../../config/constants";
+import { BLOCK_SIZE, MAP_SIZE, SNAKE_SPEED, FOOD_RESPAWN_DELAY, FOOD_COUNT } from "../../../config/constants";
 import { FoodColor } from "../../../models/enums";
 import { SnakeGame } from "../game.component";
 import { Food } from "./food"; 
@@ -11,6 +11,7 @@ export class GameEngine {
   context: CanvasRenderingContext2D 
   player: Snake
   lastestRenderTimestamp: number = 1
+  gameOver: boolean = false
 
 
   constructor() {
@@ -20,7 +21,7 @@ export class GameEngine {
 
     this.player = this.createSnake(20, 10, FoodColor.green)
     this.player.draw()
-    this.createFood(4)
+    this.createFood(FOOD_COUNT)
 
     this.gameLoop(0)
   }
@@ -38,14 +39,23 @@ export class GameEngine {
     if(!this.lastestRenderTimestamp || now - this.lastestRenderTimestamp >= SNAKE_SPEED) {
       this.lastestRenderTimestamp = now
 
-
       // this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
       this.player.move()
       // once position updated, enqueue new segment at player.x, player.y,this
       this.player.enqueue({ x: this.player.x, y: this.player.y})
       // check if previous position was on a food piece: if so, skip dequeue(). otherwise, dequeue()
-      this.player.dequeue()
+      if(!this.player.justAteFood) {
+        this.player.dequeue()
+      } else {
+        this.player.justAteFood = false // reset so snake doesn't keep growing 
+      }
+
+      // check for collisions
+      this.checkFoodCollisions()
+      // this.checkSelfCollisions()
+
+      // check if game over
     }
 
 
@@ -55,9 +65,43 @@ export class GameEngine {
       this.food[i].draw() 
     }
 
+    if(this.gameOver) {
+      this.endGame()
+      return
+    }
+
     requestAnimationFrame(this.gameLoop.bind(this)) // bind 'this' keyword to GameEngine class
   }
 
+  checkSelfCollisions() {
+    for(let i = 1; i < this.player.body.length; i++) {
+      if(this.player.body[i].x == this.player.x && this.player.body[i].y == this.player.y) {
+        this.gameOver = true
+      }
+    }
+  }
+
+  checkFoodCollisions() {
+    for(let i = 0; i < this.food.length; i++) {
+      if(this.food[i].x == this.player.x && this.food[i].y == this.player.y) {
+        this.player.justAteFood = true  // skip next dequeue
+        this.food.splice(i, 1) // remove food
+        this.newFood() // add new food to replace
+        break // don't keep looking for collisions because there should only be one food per block
+      }
+    }
+  }
+
+  endGame() {
+    console.log('game over!')
+  }
+
+  /**
+   * adds new food to the map after a delay
+   */
+  newFood() {
+    setTimeout(() =>  this.food.push(new Food(this.randomMapLocation(), this.randomMapLocation(), this.context)), FOOD_RESPAWN_DELAY )
+  }
 
   createSnake(x: number, y: number, color: FoodColor) {
     return new Snake(x, y, color, this.context)
@@ -86,6 +130,6 @@ export class GameEngine {
 
   randomMapLocation(): number {
     let random =  Math.floor(Math.random() * MAP_SIZE)
-    return random * BLOCK_SIZE
+    return random 
   }
 }
