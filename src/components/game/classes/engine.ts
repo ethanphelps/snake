@@ -42,18 +42,10 @@ export class GameEngine {
       // this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
       this.player.move()
-      console.log(this.player.body)
-
       // once position updated, enqueue new segment at player.x, player.y,this
       this.player.enqueue({ x: this.player.x, y: this.player.y})
       // check if previous position was on a food piece: if so, skip dequeue(). otherwise, dequeue()
       this.player.dequeue()
-
-
-      // this.player.draw()
-      // for(let i in this.food) {
-      //   this.food[i].draw() 
-      // }
     }
 
 

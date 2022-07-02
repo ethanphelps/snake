@@ -27,18 +27,14 @@ export class Snake {
     this.y = y
     this.color = color
     this.context = context
-    this.body = [ {x: this.x, y: this.y }] // body is a "queue" data structure - enqueueing most recent element to front and dequeueing from end (unless food just eaten)
+    this.body = [ {x: this.x, y: this.y },{x: this.x, y: this.y + 1 } ] // body is a "queue" data structure - enqueueing most recent element to front and dequeueing from end (unless food just eaten)
+    this.tail = this.body.length
 
     document.addEventListener('keydown', this.changeDirection.bind(this))
   }
 
 
   draw() {
-    // this.context.beginPath()
-    // this.context.fillStyle = FoodColor.green
-    // this.context.fillRect(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
-    
-    // loop through body and draw each segment of the body
     for(let element of this.body) {
       this.context.beginPath()
       this.context.fillStyle = FoodColor.green
@@ -54,12 +50,9 @@ export class Snake {
 
   
   dequeue() {
-    // const element = this.body[this.head]
-    // this.body.splice(this.head, 1)
-    // this.head++ // moving head marker forward in the array
-    // this.body.shift()
     this.body = this.body.slice(1)
     console.log(this.body.length)
+    this.tail-- // move tail marker back to be one past the snake's "head"
   }
 
 
@@ -78,19 +71,13 @@ export class Snake {
    */
   changeDirection(e: KeyboardEvent) {
     if(e.key == 'w' || e.key == 'ArrowUp') {
-      // this.y -= 1    
       this.direction = Directions.Up
     } else if(e.key == 's' || e.key == 'ArrowDown') {
-      // this.y +=1
       this.direction = Directions.Down
     } else if(e.key == 'a' || e.key == 'ArrowLeft') {
-      // this.x -=1
       this.direction = Directions.Left
     } else if(e.key == 'd' || e.key == 'ArrowRight') {
-      // this.x +=1
       this.direction = Directions.Right
     }
-    // console.log(this.direction)
-    // console.log(`${this.x} , ${this.y}`)
   }
 }
