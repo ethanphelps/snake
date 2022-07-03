@@ -12,7 +12,7 @@ import { Directions, DirectionVector, Position } from "../../../models/models"
  *      or make a base snake class that doesn't respond to user input and then subclass it to make a
  *      Player class
  */
-export class Snake {
+export default class Snake {
   x: number // measured in blocks
   y: number // measured in blocks
   color: string

@@ -1,8 +1,9 @@
 import { BLOCK_SIZE, MAP_SIZE, SNAKE_SPEED, FOOD_RESPAWN_DELAY, FOOD_COUNT } from "../../../config/constants";
 import { FoodColor } from "../../../models/enums";
 import { SnakeGame } from "../game.component";
-import { Food } from "./food"; 
-import { Snake } from "./snake";
+import Food from "./food"; 
+import Snake from "./snake";
+import CoordinateSet from "./coordinateSet";
 
 
 export class GameEngine {
@@ -12,6 +13,7 @@ export class GameEngine {
   player: Snake
   lastestRenderTimestamp: number = 1
   gameOver: boolean = false
+  foodCoordinates = new CoordinateSet()
 
 
   constructor() {
@@ -87,6 +89,7 @@ export class GameEngine {
     for(let i = 0; i < this.food.length; i++) {
       if(this.food[i].x == this.player.x && this.food[i].y == this.player.y) {
         this.player.justAteFood = true  // skip next dequeue
+        this.foodCoordinates.remove(this.food[i].x, this.food[i].y) // remove food coordinates from set
         this.food.splice(i, 1) // remove food
         this.newFood() // add new food to replace
         break // don't keep looking for collisions because there should only be one food per block
@@ -108,7 +111,18 @@ export class GameEngine {
    * adds new food to the map after a delay
    */
   newFood() {
-    setTimeout(() =>  this.food.push(new Food(this.randomMapLocation(), this.randomMapLocation(), this.context)), FOOD_RESPAWN_DELAY )
+    let foodLocation = { x: this.randomMapLocation(), y: this.randomMapLocation() }
+    // don't spawn food on top of other food
+    while(this.foodCoordinates.has(foodLocation.x, foodLocation.y)) {
+      foodLocation.x = this.randomMapLocation()
+      foodLocation.y = this.randomMapLocation()
+    }
+    // add unique coordinates 
+    this.foodCoordinates.add(foodLocation.x, foodLocation.y)
+    // put food on the screen after delay
+    setTimeout(() =>  {
+      this.food.push(new Food(foodLocation.x, foodLocation.y, this.context))
+    }, FOOD_RESPAWN_DELAY )
   }
 
   createSnake(x: number, y: number, color: FoodColor) {
@@ -132,6 +146,7 @@ export class GameEngine {
     for(let i = 0; i < count; i++) {
       let food = new Food(this.randomMapLocation(), this.randomMapLocation(), this.context)
       this.food.push(food)
+      this.foodCoordinates.add(food.x, food.y)
     }
   }
 

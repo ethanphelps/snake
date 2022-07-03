@@ -1,7 +1,7 @@
 import { FoodColor } from "../../../models/enums"
 import { BLOCK_SIZE } from "../../../config/constants"
 
-export class Food {
+export default class Food {
   x: number
   y: number
   color: FoodColor
