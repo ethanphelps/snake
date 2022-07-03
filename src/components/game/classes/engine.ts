@@ -13,7 +13,7 @@ export class GameEngine {
   player: Snake
   lastestRenderTimestamp: number = 1
   gameOver: boolean = false
-  foodCoordinates = new CoordinateSet()
+  occupiedCoordinates = new CoordinateSet()
 
 
   constructor() {
@@ -43,10 +43,10 @@ export class GameEngine {
 
       this.player.move()
       // once position updated, enqueue new segment at player.x, player.y,this
-      this.player.enqueue({ x: this.player.x, y: this.player.y})
+      this.player.enqueue({ x: this.player.x, y: this.player.y}, this.occupiedCoordinates)
       // check if previous position was on a food piece: if so, skip dequeue(). otherwise, dequeue()
       if(!this.player.justAteFood) {
-        this.player.dequeue()
+        this.player.dequeue(this.occupiedCoordinates)
       } else {
         this.player.justAteFood = false // reset so snake doesn't keep growing 
       }
@@ -81,6 +81,7 @@ export class GameEngine {
     for(let i = this.player.body.length - 5; i >= 0; i--) {
       if(this.player.body[i].x == this.player.x && this.player.body[i].y == this.player.y) {
         this.gameOver = true
+        console.log('self collision!')
       }
     }
   }
@@ -89,7 +90,7 @@ export class GameEngine {
     for(let i = 0; i < this.food.length; i++) {
       if(this.food[i].x == this.player.x && this.food[i].y == this.player.y) {
         this.player.justAteFood = true  // skip next dequeue
-        this.foodCoordinates.remove(this.food[i].x, this.food[i].y) // remove food coordinates from set
+        this.occupiedCoordinates.remove(this.food[i].x, this.food[i].y) // remove food coordinates from set
         this.food.splice(i, 1) // remove food
         this.newFood() // add new food to replace
         break // don't keep looking for collisions because there should only be one food per block
@@ -100,11 +101,14 @@ export class GameEngine {
   checkOutOfBounds() {
     if(this.player.x < 0 || this.player.x >= MAP_SIZE || this.player.y < 0 || this.player.y >= MAP_SIZE) {
       this.gameOver = true
+      console.log('out of bounds!')
     }
   }
 
   endGame() {
     console.log('game over!')
+    console.log(`snake's head: ${this.player.x}, ${this.player.y}`)
+    console.log(`snake's body: ${this.player.bodyToString()}`)
   }
 
   /**
@@ -113,12 +117,12 @@ export class GameEngine {
   newFood() {
     let foodLocation = { x: this.randomMapLocation(), y: this.randomMapLocation() }
     // don't spawn food on top of other food
-    while(this.foodCoordinates.has(foodLocation.x, foodLocation.y)) {
+    while(this.occupiedCoordinates.has(foodLocation.x, foodLocation.y)) {
       foodLocation.x = this.randomMapLocation()
       foodLocation.y = this.randomMapLocation()
     }
     // add unique coordinates 
-    this.foodCoordinates.add(foodLocation.x, foodLocation.y)
+    this.occupiedCoordinates.add(foodLocation.x, foodLocation.y)
     // put food on the screen after delay
     setTimeout(() =>  {
       this.food.push(new Food(foodLocation.x, foodLocation.y, this.context))
@@ -146,7 +150,7 @@ export class GameEngine {
     for(let i = 0; i < count; i++) {
       let food = new Food(this.randomMapLocation(), this.randomMapLocation(), this.context)
       this.food.push(food)
-      this.foodCoordinates.add(food.x, food.y)
+      this.occupiedCoordinates.add(food.x, food.y)
     }
   }
 

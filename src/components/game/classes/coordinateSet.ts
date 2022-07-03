@@ -1,4 +1,7 @@
-// uses an internal tree structure to simulate set-like behaviour
+/**
+ * uses an internal tree structure to simulate set-like behaviour
+ * used in GameEngine class to defined a set of "occupied" coordinates where food should not be spawned
+ */ 
 export default class CoordinateSet {
   tree: Record<number, Record<number, boolean>> = {}
 
@@ -23,6 +26,6 @@ export default class CoordinateSet {
   }
 
   has(x: number, y: number) {
-    return !!this.tree[x]?.[y];
+    return !!this.tree[x]?.[y]; // this.tree[x]?.[y] can return undefined, and !!undefined == true
   }
 }

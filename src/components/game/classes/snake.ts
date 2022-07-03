@@ -1,6 +1,7 @@
 import { FoodColor } from "../../../models/enums"
 import { BLOCK_SIZE } from "../../../config/constants"
 import { Directions, DirectionVector, Position } from "../../../models/models"
+import CoordinateSet from "./coordinateSet"
 
 
 /**
@@ -44,14 +45,16 @@ export default class Snake {
   }
 
 
-  enqueue(element: Position) {
+  enqueue(element: Position, occupiedCoordinates: CoordinateSet) {
+    occupiedCoordinates.add(element.x, element.y) // add new element's coordinates to occupied coordinates set
     this.body[this.tail] = element
     this.tail++ // moving tail marker forward in the array
   }
 
   
   // removes element from tail of snake which is front of body array
-  dequeue() {
+  dequeue(occupiedCoordinates: CoordinateSet) {
+    occupiedCoordinates.remove(this.body[0].x, this.body[0].y) // remove last body element's coordinates from occupied coordinates set
     this.body = this.body.slice(1)
     this.tail-- // move tail marker back to be one past the snake's "head"
   }
@@ -81,5 +84,19 @@ export default class Snake {
     } else if((e.key == 'd' || e.key == 'ArrowRight') && (this.body.length == 1 || this.direction != Directions.Left)) {
       this.direction = Directions.Right
     }
+  }
+
+  /**
+   * 
+   * @returns this.body as a pretty printed string for debugging
+   */
+  bodyToString() {
+    let result = "["
+    // iterate in reverse since 'head' is at end of arary
+    for(let i = this.body.length - 1; i >= 0; i--) {
+      result += ` (${this.body[i].x},${this.body[i].y}),` 
+    }
+    result += " ]"
+    return result
   }
 }
