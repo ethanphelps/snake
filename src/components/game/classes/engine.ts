@@ -39,8 +39,6 @@ export class GameEngine {
     if(!this.lastestRenderTimestamp || now - this.lastestRenderTimestamp >= SNAKE_SPEED) {
       this.lastestRenderTimestamp = now
 
-      // this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
-
       this.player.move()
       // once position updated, enqueue new segment at player.x, player.y,this
       this.player.enqueue({ x: this.player.x, y: this.player.y})
@@ -53,11 +51,9 @@ export class GameEngine {
 
       // check for collisions
       this.checkFoodCollisions()
-      // this.checkSelfCollisions()
-
-      // check if game over
+      this.checkSelfCollisions()
+      this.checkOutOfBounds()
     }
-
 
     // ---- redraw stuff every frame
     this.player.draw()
@@ -65,6 +61,7 @@ export class GameEngine {
       this.food[i].draw() 
     }
 
+    // check for gameOver instead of calling endGame() directly so food gets drawn before game loop stops 
     if(this.gameOver) {
       this.endGame()
       return
@@ -73,8 +70,13 @@ export class GameEngine {
     requestAnimationFrame(this.gameLoop.bind(this)) // bind 'this' keyword to GameEngine class
   }
 
+  /**
+   * player.x, player.y is the LAST element of player.body, also the first four elements of the
+   * snake's body can't touch each other, so we start on the fifth element and iterate backwards
+   * through the array to check for self-collision
+   *  */ 
   checkSelfCollisions() {
-    for(let i = 1; i < this.player.body.length; i++) {
+    for(let i = this.player.body.length - 5; i >= 0; i--) {
       if(this.player.body[i].x == this.player.x && this.player.body[i].y == this.player.y) {
         this.gameOver = true
       }
@@ -89,6 +91,12 @@ export class GameEngine {
         this.newFood() // add new food to replace
         break // don't keep looking for collisions because there should only be one food per block
       }
+    }
+  }
+
+  checkOutOfBounds() {
+    if(this.player.x < 0 || this.player.x >= MAP_SIZE || this.player.y < 0 || this.player.y >= MAP_SIZE) {
+      this.gameOver = true
     }
   }
 

@@ -50,6 +50,7 @@ export class Snake {
   }
 
   
+  // removes element from tail of snake which is front of body array
   dequeue() {
     this.body = this.body.slice(1)
     this.tail-- // move tail marker back to be one past the snake's "head"
@@ -66,17 +67,18 @@ export class Snake {
 
 
   /**
-   * eventually have keypress change the "direction vector" of the snake 
+   * changes this.direction with a new direction vector only if the new direction won't
+   * cause the snake to move on top of itself
    * @param e KeyboardEvent emmitted by key press
    */
   changeDirection(e: KeyboardEvent) {
-    if(e.key == 'w' || e.key == 'ArrowUp') {
-      this.direction = Directions.Up
-    } else if(e.key == 's' || e.key == 'ArrowDown') {
+    if((e.key == 'w' || e.key == 'ArrowUp') && (this.body.length == 1 || this.direction != Directions.Down)) {
+        this.direction = Directions.Up
+    } else if((e.key == 's' || e.key == 'ArrowDown') && (this.body.length == 1 || this.direction != Directions.Up)) {
       this.direction = Directions.Down
-    } else if(e.key == 'a' || e.key == 'ArrowLeft') {
+    } else if((e.key == 'a' || e.key == 'ArrowLeft') && (this.body.length == 1 || this.direction != Directions.Right)) {
       this.direction = Directions.Left
-    } else if(e.key == 'd' || e.key == 'ArrowRight') {
+    } else if((e.key == 'd' || e.key == 'ArrowRight') && (this.body.length == 1 || this.direction != Directions.Left)) {
       this.direction = Directions.Right
     }
   }
