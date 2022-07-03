@@ -17,7 +17,7 @@ export class SnakeGame extends LitElement {
     window.addEventListener('load', () => this.engine = new GameEngine())
   }
   disconnectedCallback() {
-    super.connectedCallback()
+    super.disconnectedCallback()
     window.removeEventListener('load', () => this.engine = new GameEngine())
   }
   

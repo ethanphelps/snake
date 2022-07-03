@@ -7,7 +7,7 @@ import CoordinateSet from "./coordinateSet"
 /**
  * The Snake's body is implemented as a Queue that is constantly being dequeued each 'tick' UNLESS the
  * snake is consuming food during this tick. If the snake is consuming food, then we skip the dequeue 
- * which allows the snake to grow. The snake moves by having body enqueued every tick
+ * which allows the snake to grow. The snake moves by having body enqueued and dequeued every tick
  * 
  * note: this could just be added to the Snake class instead of being implemented as a separate class?
  *      or make a base snake class that doesn't respond to user input and then subclass it to make a
@@ -85,6 +85,7 @@ export default class Snake {
       this.direction = Directions.Right
     }
   }
+
 
   /**
    * 

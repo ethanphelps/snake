@@ -29,7 +29,8 @@ export class GameEngine {
   }
 
   /**
-   * 
+   * this function defines the game loop that handles drawing, keeping track of ticks and updating
+   * players/food on the map. 
    * @param now timestamp of the current time in this animation frame
    */
   gameLoop(now: DOMHighResTimeStamp) {
