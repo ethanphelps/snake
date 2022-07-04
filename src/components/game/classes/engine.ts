@@ -4,6 +4,7 @@ import { SnakeGame } from "../game.component";
 import Food from "./food"; 
 import Snake from "./snake";
 import CoordinateSet from "./coordinateSet";
+import { LitElement } from "lit";
 
 
 export class GameEngine {
@@ -20,12 +21,9 @@ export class GameEngine {
     this.food = [] 
     this.canvas = this.getCanvas()
     this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D
-
-    this.player = this.createSnake(20, 10, FoodColor.green)
+    this.player = this.createSnake(MAP_SIZE/2, MAP_SIZE/2, FoodColor.green)
     this.player.draw()
     this.createFood(FOOD_COUNT)
-
-    this.gameLoop(0)
   }
 
   /**
@@ -67,7 +65,7 @@ export class GameEngine {
     // check for gameOver instead of calling endGame() directly so food gets drawn before game loop stops 
     if(this.gameOver) {
       this.endGame()
-      return
+      return // exits game loop
     }
 
     requestAnimationFrame(this.gameLoop.bind(this)) // bind 'this' keyword to GameEngine class
@@ -110,6 +108,15 @@ export class GameEngine {
     console.log('game over!')
     console.log(`snake's head: ${this.player.x}, ${this.player.y}`)
     console.log(`snake's body: ${this.player.bodyToString()}`)
+    // console.log(window)
+    window.dispatchEvent(new CustomEvent('game-over', {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail: {
+        score: this.player.body.length
+      }
+    }))
   }
 
   /**

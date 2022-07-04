@@ -1,2 +1,40 @@
+@import '../../_colors'
+
 .canvas
   border: solid 2px white
+  position: relative
+  display: flex
+  align-items: center
+  justify-content: center
+
+.button-container
+  position: absolute
+  bottom: -80px
+  left: 0
+  right: 0
+  display: flex
+  align-items: center
+  justify-content: center
+
+.new-game-button
+  background: $dark-bg
+  font-family: 'Press Start 2P'
+  color: white
+  padding: 15px
+  font-size: 15px
+
+.game-over-container
+  position: absolute
+  top: -15
+  left: 0
+  right: 0
+  display: flex
+  align-items: center
+  justify-content: center
+
+.game-over-text
+  font-family: 'Press Start 2P' 
+  color: red
+  position: absolute
+  top: -60px 
+  display: none

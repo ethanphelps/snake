@@ -7,10 +7,10 @@ module.exports = (env, argv) => ({
   entry: {
     app: "./src/index.ts",
   },
-  // devServer: {
-  //     contentBase: path.join(__dirname, 'dist'),
-  //     historyApiFallback: true
-  // },
+  devServer: {
+      static: path.join(__dirname, './'), // tell dev server where to serve content from 
+      historyApiFallback: true
+  },
   devtool: argv.mode === "production" ? "none" : "inline-source-map",
   plugins: [
     new CleanWebpackPlugin(),
@@ -55,6 +55,7 @@ module.exports = (env, argv) => ({
       {
         test: /\.(png|gif|jpg|cur)$/i,
         loader: "url-loader",
+        // type: 'asset/resource',
         options: { limit: 8192 },
       },
       {
