@@ -1,10 +1,11 @@
-import { BLOCK_SIZE, MAP_SIZE, SNAKE_SPEED, FOOD_RESPAWN_DELAY, FOOD_COUNT } from "../../../config/constants";
+import { BLOCK_SIZE, MAP_SIZE, SNAKE_SPEED, FOOD_RESPAWN_DELAY, FOOD_COUNT, SCORE_INCREASED, GAME_OVER} from "../../../config/constants";
 import { FoodColor } from "../../../models/enums";
 import { SnakeGame } from "../game.component";
 import Food from "./food"; 
 import Snake from "./snake";
 import CoordinateSet from "./coordinateSet";
 import { LitElement } from "lit";
+import { gameUpdate } from "../../../utils/utils";
 
 
 export class GameEngine {
@@ -71,6 +72,7 @@ export class GameEngine {
     requestAnimationFrame(this.gameLoop.bind(this)) // bind 'this' keyword to GameEngine class
   }
 
+
   /**
    * player.x, player.y is the LAST element of player.body, also the first four elements of the
    * snake's body can't touch each other, so we start on the fifth element and iterate backwards
@@ -92,10 +94,13 @@ export class GameEngine {
         this.occupiedCoordinates.remove(this.food[i].x, this.food[i].y) // remove food coordinates from set
         this.food.splice(i, 1) // remove food
         this.newFood() // add new food to replace
+
+        window.dispatchEvent(gameUpdate(SCORE_INCREASED))
         break // don't keep looking for collisions because there should only be one food per block
       }
     }
   }
+
 
   checkOutOfBounds() {
     if(this.player.x < 0 || this.player.x >= MAP_SIZE || this.player.y < 0 || this.player.y >= MAP_SIZE) {
@@ -104,20 +109,18 @@ export class GameEngine {
     }
   }
 
+
   endGame() {
     console.log('game over!')
     console.log(`snake's head: ${this.player.x}, ${this.player.y}`)
     console.log(`snake's body: ${this.player.bodyToString()}`)
-    // console.log(window)
-    window.dispatchEvent(new CustomEvent('game-over', {
-      bubbles: true,
-      cancelable: false,
-      composed: true,
-      detail: {
+    window.dispatchEvent(
+      gameUpdate(GAME_OVER, {
         score: this.player.body.length
       }
-    }))
+    ))
   }
+
 
   /**
    * adds new food to the map after a delay
@@ -136,6 +139,7 @@ export class GameEngine {
       this.food.push(new Food(foodLocation.x, foodLocation.y, this.context))
     }, FOOD_RESPAWN_DELAY )
   }
+
 
   createSnake(x: number, y: number, color: FoodColor) {
     return new Snake(x, y, color, this.context)
