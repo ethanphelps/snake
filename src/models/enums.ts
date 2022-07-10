@@ -10,3 +10,9 @@ export enum FoodColor {
   pink = '#E255A1',
   red = '#FF7369'
 }
+
+export enum Difficulty {
+  easy = 'easy',
+  medium = 'medium',
+  hard = 'hard'
+}

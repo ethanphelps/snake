@@ -3,6 +3,7 @@ import { LitElement, html, TemplateResult } from "lit";
 import { NEW_HIGH_SCORE, HIGH_SCORE} from "../../../config/constants";
 import styles from "./navbar.component.sass"
 
+
 @customElement('navbar-component')
 export class NavBar extends LitElement {
   static styles = [styles]
@@ -43,7 +44,8 @@ export class NavBar extends LitElement {
   render(): TemplateResult {
      return html`
       <nav class="navbar">
-        <h4>High Score: ${this.highScore}</h4>
+        <toggle-buttons></toggle-buttons>
+        <h4 class="high-score">High Score: ${this.highScore}</h4>
         <p>SNAKE</p>
       </nav>
      ` 

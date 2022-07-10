@@ -1,0 +1,36 @@
+@import '../../colors'
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Press+Start+2P&display=swap')
+
+
+.difficulty-container
+  position: absolute
+  left: 30px
+  display: flex
+  align-items: center
+
+.difficulty-button
+  background: $dark-bg
+  font-family: 'Press Start 2P'
+  color: white
+  padding: 15px
+  font-size: 12px
+  margin-left: 12px
+  border-left: 2px solid gray
+  border-top: 2px solid gray
+  border-right: 2px solid $dark-gray
+  border-bottom: 2px solid $dark-gray
+
+.active
+  border-right: 2px solid gray
+  border-bottom: 2px solid gray
+  border-left: 2px solid $dark-gray
+  border-top: 2px solid $dark-gray
+
+#easy.active
+  color: green
+
+#medium.active
+  color: orange
+
+#hard.active
+  color: red
