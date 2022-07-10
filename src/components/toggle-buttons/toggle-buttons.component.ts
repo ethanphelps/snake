@@ -8,6 +8,11 @@ import styles from "./toggle-buttons.component.sass";
 export class ToggleButtons extends LitElement {
   static styles = [styles];
 
+  /**
+   * Loops through all the buttons with class .difficulty-button and toggles the active class.
+   * This "unpresses" the previously pressed button. Then, button just pressed is set to active.
+   * @param e a click event dispatched when one of the toggle buttons is clicked
+   */
   togglePressed(e: Event) {
     // get all buttons with .difficulty-button class
     const buttons = document

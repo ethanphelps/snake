@@ -40,7 +40,6 @@ export class GameEngine {
   gameLoop(now: DOMHighResTimeStamp) {
     //clear the canvas every frame
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
     // ----  other tasks
     // update snake position every SNAKE_SPEED ms
     if (
@@ -48,7 +47,6 @@ export class GameEngine {
       now - this.lastestRenderTimestamp >= this.updateSpeed
     ) {
       this.lastestRenderTimestamp = now;
-
       this.player.move();
       // once position updated, enqueue new segment at player.x, player.y,this
       this.player.enqueue(
@@ -61,25 +59,21 @@ export class GameEngine {
       } else {
         this.player.justAteFood = false; // reset so snake doesn't keep growing
       }
-
       // check for collisions
       this.checkFoodCollisions();
       this.checkSelfCollisions();
       this.checkOutOfBounds();
     }
-
     // ---- redraw stuff every frame
     this.player.draw();
     for (let i in this.food) {
       this.food[i].draw();
     }
-
     // check for gameOver instead of calling endGame() directly so food gets drawn before game loop stops
     if (this.gameOver) {
       this.endGame();
       return; // exits game loop
     }
-
     requestAnimationFrame(this.gameLoop.bind(this)); // bind 'this' keyword to GameEngine class
   }
 
@@ -185,7 +179,6 @@ export class GameEngine {
       this.occupiedCoordinates.add(food.x, food.y);
     }
   }
-
 
   randomMapLocation(): number {
     let random = Math.floor(Math.random() * MAP_SIZE);

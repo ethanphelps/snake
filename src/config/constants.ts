@@ -11,13 +11,12 @@ export const SNAKE_SPEEDS = {
   hard: HARD_SPEED
 }
 
+// custom event names
 export const NEW_GAME = "new-game";
 export const GAME_OVER = "game-over";
 export const SCORE_INCREASED = "score-increased";
 export const NEW_HIGH_SCORE = "new-high-score";
-// export const EASY_CLICKED = "easy"
-// export const MEDIUM_CLICKED = "medium"
-// export const HARD_CLICKED = "hard"
 export const DIFFICULTY_CHANGED = "difficulty-changed"
 
+// local storage key names
 export const HIGH_SCORE = "snake-high-score";

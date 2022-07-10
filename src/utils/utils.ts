@@ -1,3 +1,8 @@
+/**
+ * Wrapper around window.dispatchEvent for dispatching custom events 
+ * @param eventName name of the event to be dispatched
+ * @param detail the optional detail parameter to add to the CustomEvent
+ */
 export const broadcastGameUpdate = (
   eventName: string,
   detail?: Object
@@ -12,6 +17,11 @@ export const broadcastGameUpdate = (
   );
 };
 
+/**
+ * Wrapper around adding an event listener for a CustomEvent to the window.  
+ * @param eventName name of the event to listen for
+ * @param callback the function to be called when this event is received
+ */
 export const listenFor = (eventName: string, callback: Function): void => {
   window.addEventListener(eventName, (e: Event) => {
     if (e instanceof CustomEvent) {
@@ -20,6 +30,11 @@ export const listenFor = (eventName: string, callback: Function): void => {
   });
 };
 
+/**
+ * Wrapper for removing a CustomEvent event listner 
+ * @param eventName name of the event to remove a listener for
+ * @param callback the function passed to window.addEventListener
+ */
 export const removeCustomListener = (
   eventName: string,
   callback: Function

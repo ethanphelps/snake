@@ -19,6 +19,7 @@ import gameStyles from "./game.component.sass";
 import { GameEngine } from "./classes/engine";
 import { Difficulty } from "../../models/enums";
 
+
 @customElement("game-component")
 export class SnakeGame extends LitElement {
   static styles = [gameStyles];
@@ -28,6 +29,7 @@ export class SnakeGame extends LitElement {
 
   @property()
   score: number = 0; // declared as property so score gets rerendered when its value changes
+
 
   constructor() {
     super();
@@ -44,10 +46,12 @@ export class SnakeGame extends LitElement {
     );
   }
 
+
   firstUpdated() {
     // instantiate the game engine AFTER the page loads so the canvas isn't null
     window.addEventListener("load", () => (this.engine = new GameEngine()));
   }
+
 
   disconnectedCallback() {
     super.disconnectedCallback();
@@ -61,6 +65,7 @@ export class SnakeGame extends LitElement {
     );
   }
 
+
   newGame() {
     // start new game using this.engine.gameLoop(0)
     this.setGameOverVisibility("none");
@@ -72,15 +77,18 @@ export class SnakeGame extends LitElement {
     this.hideMouseAfterIdle();
   }
 
+
   hideMouseAfterIdle() {
     // short delay to avoid mouse reappearing if hand bumps mouse while clicking
     setTimeout(() => (document.onmousemove = this.mouseMoveEventListener), 500);
   }
 
+
   disableHideMouseAfterIdle() {
     window.clearTimeout(this.hideCursorTimeoutId); // remove hide cursor timer
     document.onmousemove = null;
   }
+
 
   mouseMoveEventListener() {
     // function to be called after 2 seconds of idle mouse
@@ -91,6 +99,7 @@ export class SnakeGame extends LitElement {
     document.body.style.cursor = "default";
     this.hideCursorTimeoutId = window.setTimeout(hideCursor, 2000); // hide after 3 seconds idle
   }
+
 
   gameOver() {
     this.setGameOverVisibility("block");
