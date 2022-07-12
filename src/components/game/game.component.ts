@@ -19,17 +19,15 @@ import gameStyles from "./game.component.sass";
 import { GameEngine } from "./classes/engine";
 import { Difficulty } from "../../models/enums";
 
-
 @customElement("game-component")
 export class SnakeGame extends LitElement {
   static styles = [gameStyles];
-  engine: GameEngine = {} as GameEngine; // engine and state stored locally, but later state will be stored remotely
+  engine?: GameEngine = {} as GameEngine; // engine and state stored locally, but later state will be stored remotely
   hideCursorTimeoutId: number | undefined;
   difficulty: Difficulty = Difficulty.easy;
 
   @property()
   score: number = 0; // declared as property so score gets rerendered when its value changes
-
 
   constructor() {
     super();
@@ -46,25 +44,25 @@ export class SnakeGame extends LitElement {
     );
   }
 
-
   firstUpdated() {
     // instantiate the game engine AFTER the page loads so the canvas isn't null
-    window.addEventListener("load", () => (this.engine = new GameEngine()));
+    // window.addEventListener("load", () => (this.engine = new GameEngine()));
   }
 
-
+  /**
+   * This function has references to this.engine, which could be causing the old engines to not be garbage collected
+   */
   disconnectedCallback() {
     super.disconnectedCallback();
-    window.removeEventListener("load", () => (this.engine = new GameEngine()));
-    window.removeEventListener(GAME_OVER, () => this.gameOver.bind(this));
-    window.removeEventListener(NEW_GAME, () => this.newGame.bind(this));
+    // window.removeEventListener("load", () => (this.engine = new GameEngine()));
+    // window.removeEventListener(GAME_OVER, () => this.gameOver.bind(this));
+    // window.removeEventListener(NEW_GAME, () => this.newGame.bind(this));
     window.removeEventListener(SCORE_INCREASED, () => this.score++); // does this actually remove the event?
     removeCustomListener(
       DIFFICULTY_CHANGED,
       (e: CustomEvent) => (this.difficulty = e.detail.newDifficulty)
     );
   }
-
 
   newGame() {
     // start new game using this.engine.gameLoop(0)
@@ -77,18 +75,15 @@ export class SnakeGame extends LitElement {
     this.hideMouseAfterIdle();
   }
 
-
   hideMouseAfterIdle() {
     // short delay to avoid mouse reappearing if hand bumps mouse while clicking
     setTimeout(() => (document.onmousemove = this.mouseMoveEventListener), 500);
   }
 
-
   disableHideMouseAfterIdle() {
     window.clearTimeout(this.hideCursorTimeoutId); // remove hide cursor timer
     document.onmousemove = null;
   }
-
 
   mouseMoveEventListener() {
     // function to be called after 2 seconds of idle mouse
@@ -99,7 +94,6 @@ export class SnakeGame extends LitElement {
     document.body.style.cursor = "default";
     this.hideCursorTimeoutId = window.setTimeout(hideCursor, 2000); // hide after 3 seconds idle
   }
-
 
   gameOver() {
     this.setGameOverVisibility("block");
@@ -112,6 +106,8 @@ export class SnakeGame extends LitElement {
       // notify nav bar of new high score
       broadcastGameUpdate(NEW_HIGH_SCORE);
     }
+
+    delete this.engine
   }
 
   setGameOverVisibility(value: string) {

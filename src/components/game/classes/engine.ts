@@ -13,6 +13,10 @@ import CoordinateSet from "./coordinateSet";
 import { broadcastGameUpdate } from "../../../utils/utils";
 
 export class GameEngine {
+  static currentId = 0;    
+  _id = ++GameEngine.currentId;
+  boundKeydownCallback = this.keydownCallback.bind(this)
+
   food: Food[];
   canvas: HTMLCanvasElement;
   context: CanvasRenderingContext2D;
@@ -21,6 +25,7 @@ export class GameEngine {
   gameOver: boolean = false;
   occupiedCoordinates = new CoordinateSet();
   updateSpeed: number;
+  paused = false;
 
   constructor(difficulty: Difficulty = Difficulty.easy) {
     this.food = [];
@@ -30,6 +35,11 @@ export class GameEngine {
     this.player.draw();
     this.createFood(FOOD_COUNT);
     this.updateSpeed = SNAKE_SPEEDS[difficulty];
+
+    // listen for pause/unpause
+    document.addEventListener("keydown", this.boundKeydownCallback);
+
+    console.log(this._id)
   }
 
   /**
@@ -74,6 +84,11 @@ export class GameEngine {
       this.endGame();
       return; // exits game loop
     }
+    // check if paused
+    if (this.paused) {
+      return; // exit game loop and wait for another space bar press to reenter the game loop
+    }
+
     requestAnimationFrame(this.gameLoop.bind(this)); // bind 'this' keyword to GameEngine class
   }
 
@@ -122,15 +137,24 @@ export class GameEngine {
 
   endGame() {
     console.log("game over!");
+    console.log(this._id)
     console.log(`snake's head: ${this.player.x}, ${this.player.y}`);
     console.log(`snake's body: ${this.player.bodyToString()}`);
     broadcastGameUpdate(GAME_OVER, {
       score: this.player.body.length,
     });
+
+    document.removeEventListener("keydown", this.boundKeydownCallback);
+    // document.removeEventListener("keydown", (e: KeyboardEvent) => {
+    //   if (e.key == " ") this.togglePause();
+    // });
+    // document.removeEventListener("keydown", (e: KeyboardEvent) => {
+    //   if (e.key == " ") this.togglePause();
+    // });
   }
 
   /**
-   * adds new food to the map after a delay
+   * adds new food to the map after a delay. makes sure not to spawn food on top of other food.
    */
   newFood() {
     let foodLocation = {
@@ -168,6 +192,10 @@ export class GameEngine {
     return canvas;
   }
 
+  /**
+   * creates a set number of food items. used in the constructor for creating the initial food on the map
+   * @param count the number of food items to create
+   */
   createFood(count: number) {
     for (let i = 0; i < count; i++) {
       let food = new Food(
@@ -184,4 +212,30 @@ export class GameEngine {
     let random = Math.floor(Math.random() * MAP_SIZE);
     return random;
   }
+
+  /**
+   * if not paused, togglePaused sets paused to true which exits the game loop on the next frame
+   * if paused, togglePaused sets paused to false and restarts the game loop, passing performance.now()
+   * and setting latestRenderTimestamp to performance.now() to prevent the game loop from immediately
+   * moving the snake (now - this.lastestRenderTimestamp >= this.updateSpeed) will be false
+   * 
+   * note: we're using performance.now() instead of Date.now() because perfomance returns a DOMHighResTimestamp
+   * while Date.now() returns # of ms since UNIX epoch. Date.now() will return something like 1657596686780
+   * while performance.now() will return something like 7513, resulting in a large negative number when compared
+   * with each other, meaning the game loop won't move the snake after being unpaused
+   */
+  togglePause(): void {
+    this.paused = !this.paused;
+    if (!this.paused) {
+      // console.log(`Date.now(): ${Date.now()}`)
+      // console.log(`performance.now(): ${performance.now()}`)
+      this.lastestRenderTimestamp = performance.now();
+      this.gameLoop(performance.now());
+    }
+  }
+
+  keydownCallback(e: KeyboardEvent): void {
+    if (e.key == " ") this.togglePause();
+  }
+
 }
