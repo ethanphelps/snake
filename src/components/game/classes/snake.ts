@@ -73,7 +73,7 @@ export default class Snake {
   move() {
     this.x += this.direction.x;
     this.y += this.direction.y;
-    console.log(`moved: ${this.x}, ${this.y}`)
+    // console.log(`moved: ${this.x}, ${this.y}`)
   }
 
   /**

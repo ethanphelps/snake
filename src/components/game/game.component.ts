@@ -25,16 +25,22 @@ export class SnakeGame extends LitElement {
   engine?: GameEngine = {} as GameEngine; // engine and state stored locally, but later state will be stored remotely
   hideCursorTimeoutId: number | undefined;
   difficulty: Difficulty = Difficulty.easy;
+  boundMouseMoveCallback = this.mouseMoveEventListener.bind(this) // named this-bound callback for event listening
 
   @property()
   score: number = 0; // declared as property so score gets rerendered when its value changes
 
   constructor() {
     super();
+
+    // set high score to zero if first time loading game
     if (!localStorage.getItem(HIGH_SCORE)) {
-      localStorage.setItem(HIGH_SCORE, "0"); // set high score to zero if first time loading game
+      localStorage.setItem(HIGH_SCORE, "0");
     }
-    // add event listeners
+
+    /**
+     * add event listeners ... can't be removed since being passed anonymously, but don't need to 
+     */
     listenFor(GAME_OVER, () => this.gameOver());
     listenFor(NEW_GAME, () => this.newGame());
     listenFor(SCORE_INCREASED, () => this.score++);
@@ -46,7 +52,7 @@ export class SnakeGame extends LitElement {
 
   firstUpdated() {
     // instantiate the game engine AFTER the page loads so the canvas isn't null
-    // window.addEventListener("load", () => (this.engine = new GameEngine()));
+    window.addEventListener("load", () => (this.engine = new GameEngine()));
   }
 
   /**
@@ -57,7 +63,7 @@ export class SnakeGame extends LitElement {
     // window.removeEventListener("load", () => (this.engine = new GameEngine()));
     // window.removeEventListener(GAME_OVER, () => this.gameOver.bind(this));
     // window.removeEventListener(NEW_GAME, () => this.newGame.bind(this));
-    window.removeEventListener(SCORE_INCREASED, () => this.score++); // does this actually remove the event?
+    window.removeEventListener(SCORE_INCREASED, () => this.score++); // does this actually remove the event? (no)
     removeCustomListener(
       DIFFICULTY_CHANGED,
       (e: CustomEvent) => (this.difficulty = e.detail.newDifficulty)
@@ -75,26 +81,43 @@ export class SnakeGame extends LitElement {
     this.hideMouseAfterIdle();
   }
 
+  // short delay to avoid mouse reappearing if hand bumps mouse while clicking
   hideMouseAfterIdle() {
-    // short delay to avoid mouse reappearing if hand bumps mouse while clicking
-    setTimeout(() => (document.onmousemove = this.mouseMoveEventListener), 500);
+    // setTimeout(() => (document.onmousemove = this.mouseMoveEventListener), 500);
+    setTimeout(() => window.addEventListener('mousemove', this.boundMouseMoveCallback), 500);
   }
 
+  /**
+   *  disables mouse hiding feature. called after game over event 
+   */
   disableHideMouseAfterIdle() {
+    console.log(this.hideCursorTimeoutId)
     window.clearTimeout(this.hideCursorTimeoutId); // remove hide cursor timer
-    document.onmousemove = null;
+    window.removeEventListener('mousemove', this.boundMouseMoveCallback)
   }
 
+  /**
+   * event listener passed to document.onmousemove to display the mouse again if moved, but hide 
+   * again if idle for 2 seconds
+   */
   mouseMoveEventListener() {
+    // don't want to fire a bunch of the same event
+    window.removeEventListener('mousemove', this.boundMouseMoveCallback)
     // function to be called after 2 seconds of idle mouse
     const hideCursor = () => {
       window.clearTimeout(this.hideCursorTimeoutId); // don't want timer to keep going off after cursor hidden
       document.body.style.cursor = "none";
+      window.addEventListener('mousemove', this.boundMouseMoveCallback) // listen for mouse move again
     };
+    // show the mouse and start timer to hide again after 2 seconds
     document.body.style.cursor = "default";
-    this.hideCursorTimeoutId = window.setTimeout(hideCursor, 2000); // hide after 3 seconds idle
+    this.hideCursorTimeoutId = window.setTimeout(hideCursor, 2000); 
   }
 
+  /**
+   * event handler that responds to Game Over event. sets UI elements to visible again and broadcasts
+   * new high score event if applicable
+   */
   gameOver() {
     this.setGameOverVisibility("block");
     document.body.style.cursor = "default";
@@ -124,6 +147,9 @@ export class SnakeGame extends LitElement {
     newGameButton!.innerText = "New Game";
   }
 
+  /**
+   * Sets score display to block
+   */
   showScore() {
     let score = document
       .getElementById("root")

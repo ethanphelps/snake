@@ -13,8 +13,6 @@ import CoordinateSet from "./coordinateSet";
 import { broadcastGameUpdate } from "../../../utils/utils";
 
 export class GameEngine {
-  static currentId = 0;    
-  _id = ++GameEngine.currentId;
   boundKeydownCallback = this.keydownCallback.bind(this)
 
   food: Food[];
@@ -38,8 +36,6 @@ export class GameEngine {
 
     // listen for pause/unpause
     document.addEventListener("keydown", this.boundKeydownCallback);
-
-    console.log(this._id)
   }
 
   /**
@@ -137,7 +133,6 @@ export class GameEngine {
 
   endGame() {
     console.log("game over!");
-    console.log(this._id)
     console.log(`snake's head: ${this.player.x}, ${this.player.y}`);
     console.log(`snake's body: ${this.player.bodyToString()}`);
     broadcastGameUpdate(GAME_OVER, {
@@ -234,6 +229,7 @@ export class GameEngine {
     }
   }
 
+  // -- Named callbacks (anonymous event listener callbacks can't removed)
   keydownCallback(e: KeyboardEvent): void {
     if (e.key == " ") this.togglePause();
   }
