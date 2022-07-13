@@ -123,10 +123,9 @@ export class SnakeGame extends LitElement {
     document.body.style.cursor = "default";
     this.disableHideMouseAfterIdle();
 
-    // set new high score if applicable
+    // set new high score if applicable and notify nav bar of new high score
     if (this.score > Number(localStorage.getItem(HIGH_SCORE))) {
       localStorage.setItem(HIGH_SCORE, this.score.toString());
-      // notify nav bar of new high score
       broadcastGameUpdate(NEW_HIGH_SCORE);
     }
 
