@@ -14,10 +14,11 @@ import {
   broadcastGameUpdate,
   listenFor,
   removeCustomListener,
+  getCanvas
 } from "../../utils/utils";
 import gameStyles from "./game.component.sass";
 import { GameEngine } from "./classes/engine";
-import { Difficulty } from "../../models/enums";
+import { Difficulty, FoodColor } from "../../models/enums";
 
 @customElement("game-component")
 export class SnakeGame extends LitElement {
@@ -51,8 +52,17 @@ export class SnakeGame extends LitElement {
   }
 
   firstUpdated() {
-    // instantiate the game engine AFTER the page loads so the canvas isn't null
-    window.addEventListener("load", () => (this.engine = new GameEngine()));
+    // access canvas AFTER the page loads so it isn't null
+    // draw green square instead of instantiating an entire game engine
+    const context = getCanvas().getContext('2d') as CanvasRenderingContext2D
+    context.beginPath();
+    context.fillStyle = FoodColor.green;
+    context.fillRect(
+      MAP_SIZE/2 * BLOCK_SIZE,
+      MAP_SIZE/2 * BLOCK_SIZE,
+      BLOCK_SIZE,
+      BLOCK_SIZE
+    );
   }
 
   /**
@@ -83,7 +93,6 @@ export class SnakeGame extends LitElement {
 
   // short delay to avoid mouse reappearing if hand bumps mouse while clicking
   hideMouseAfterIdle() {
-    // setTimeout(() => (document.onmousemove = this.mouseMoveEventListener), 500);
     setTimeout(() => window.addEventListener('mousemove', this.boundMouseMoveCallback), 500);
   }
 
@@ -91,7 +100,6 @@ export class SnakeGame extends LitElement {
    *  disables mouse hiding feature. called after game over event 
    */
   disableHideMouseAfterIdle() {
-    console.log(this.hideCursorTimeoutId)
     window.clearTimeout(this.hideCursorTimeoutId); // remove hide cursor timer
     window.removeEventListener('mousemove', this.boundMouseMoveCallback)
   }

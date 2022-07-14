@@ -10,10 +10,12 @@ import { FoodColor, Difficulty } from "../../../models/enums";
 import Food from "./food";
 import Snake from "./snake";
 import CoordinateSet from "./coordinateSet";
-import { broadcastGameUpdate } from "../../../utils/utils";
+import { broadcastGameUpdate, getCanvas} from "../../../utils/utils";
 
 export class GameEngine {
   boundKeydownCallback = this.keydownCallback.bind(this)
+  static currentId = 0;    
+   _id = ++GameEngine.currentId;
 
   food: Food[];
   canvas: HTMLCanvasElement;
@@ -27,7 +29,7 @@ export class GameEngine {
 
   constructor(difficulty: Difficulty = Difficulty.easy) {
     this.food = [];
-    this.canvas = this.getCanvas();
+    this.canvas = getCanvas();
     this.context = this.canvas.getContext("2d") as CanvasRenderingContext2D;
     this.player = this.createSnake(MAP_SIZE / 2, MAP_SIZE / 2, FoodColor.green);
     this.player.draw();
@@ -132,20 +134,13 @@ export class GameEngine {
   }
 
   endGame() {
-    console.log("game over!");
+    console.log("game over! game #: " + this._id);
     console.log(`snake's head: ${this.player.x}, ${this.player.y}`);
     console.log(`snake's body: ${this.player.bodyToString()}`);
     broadcastGameUpdate(GAME_OVER, {
       score: this.player.body.length,
     });
-
     document.removeEventListener("keydown", this.boundKeydownCallback);
-    // document.removeEventListener("keydown", (e: KeyboardEvent) => {
-    //   if (e.key == " ") this.togglePause();
-    // });
-    // document.removeEventListener("keydown", (e: KeyboardEvent) => {
-    //   if (e.key == " ") this.togglePause();
-    // });
   }
 
   /**
@@ -173,19 +168,6 @@ export class GameEngine {
     return new Snake(x, y, color, this.context);
   }
 
-  /**
-   *
-   * @returns the canvas element returned by the game-component web component. document.getElementById can't search into shadow DOMs, so
-   * we have to get the shadowRoot of each lit element component and query them individually to get the canvas
-   */
-  getCanvas(): HTMLCanvasElement {
-    let canvas = document
-      .getElementById("root")
-      ?.shadowRoot?.getElementById("game-component")
-      ?.shadowRoot?.getElementById("snakeCanvas") as HTMLCanvasElement;
-    // console.log(canvas)
-    return canvas;
-  }
 
   /**
    * creates a set number of food items. used in the constructor for creating the initial food on the map
@@ -214,6 +196,8 @@ export class GameEngine {
    * and setting latestRenderTimestamp to performance.now() to prevent the game loop from immediately
    * moving the snake (now - this.lastestRenderTimestamp >= this.updateSpeed) will be false
    * 
+   * removes snake's changeDirection event listener when paused, and adds it back when unpaused
+   * 
    * note: we're using performance.now() instead of Date.now() because perfomance returns a DOMHighResTimestamp
    * while Date.now() returns # of ms since UNIX epoch. Date.now() will return something like 1657596686780
    * while performance.now() will return something like 7513, resulting in a large negative number when compared
@@ -222,10 +206,11 @@ export class GameEngine {
   togglePause(): void {
     this.paused = !this.paused;
     if (!this.paused) {
-      // console.log(`Date.now(): ${Date.now()}`)
-      // console.log(`performance.now(): ${performance.now()}`)
       this.lastestRenderTimestamp = performance.now();
       this.gameLoop(performance.now());
+      document.addEventListener("keydown", this.player.boundChangeDirection);
+    } else {
+      document.removeEventListener("keydown", this.player.boundChangeDirection);
     }
   }
 

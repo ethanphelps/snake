@@ -45,3 +45,16 @@ export const removeCustomListener = (
     }
   });
 };
+
+/**
+ *
+ * @returns the canvas element returned by the game-component web component. document.getElementById can't search into shadow DOMs, so
+ * we have to get the shadowRoot of each lit element component and query them individually to get the canvas
+ */
+export const getCanvas = (): HTMLCanvasElement => {
+  let canvas = document
+    .getElementById("root")
+    ?.shadowRoot?.getElementById("game-component")
+    ?.shadowRoot?.getElementById("snakeCanvas") as HTMLCanvasElement;
+  return canvas;
+}
