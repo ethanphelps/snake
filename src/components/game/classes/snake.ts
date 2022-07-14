@@ -8,9 +8,6 @@ import CoordinateSet from "./coordinateSet";
  * snake is consuming food during this tick. If the snake is consuming food, then we skip the dequeue
  * which allows the snake to grow. The snake moves by having body enqueued and dequeued every tick
  *
- * note: this could just be added to the Snake class instead of being implemented as a separate class?
- *      or make a base snake class that doesn't respond to user input and then subclass it to make a
- *      Player class
  */
 export default class Snake {
   x: number; // measured in blocks
@@ -22,6 +19,7 @@ export default class Snake {
   head: number = 0; // head is the 'front' of the queue where elements get dequeued, but is the back of snake
   tail: number = 1; // counterintuitively, tail is one past the 'head' of the snake, but also the 'back' of the queue where new elements are added
   justAteFood: boolean = false;
+  boundChangeDirection = this.changeDirection.bind(this)
 
   constructor(
     x: number,
@@ -36,9 +34,7 @@ export default class Snake {
     this.body = [{ x: this.x, y: this.y }]; // body is a "queue" data structure - enqueueing most recent element to front and dequeueing from end (unless food just eaten)
     this.tail = this.body.length;
 
-    console.log('new snake!')
-
-    document.addEventListener("keydown", this.changeDirection.bind(this));
+    document.addEventListener("keydown", this.boundChangeDirection);
   }
 
   draw() {
@@ -109,7 +105,7 @@ export default class Snake {
    *
    * @returns this.body as a pretty printed string for debugging
    */
-  bodyToString() {
+  bodyToString(): string {
     let result = "[";
     // iterate in reverse since 'head' is at end of arary
     for (let i = this.body.length - 1; i >= 0; i--) {
