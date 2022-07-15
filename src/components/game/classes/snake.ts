@@ -34,6 +34,7 @@ export default class Snake {
     this.body = [{ x: this.x, y: this.y }]; // body is a "queue" data structure - enqueueing most recent element to front and dequeueing from end (unless food just eaten)
     this.tail = this.body.length;
 
+    // listen for key downs to change directions
     document.addEventListener("keydown", this.boundChangeDirection);
   }
 
