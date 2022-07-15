@@ -26,7 +26,13 @@ export class SnakeGame extends LitElement {
   engine?: GameEngine = {} as GameEngine; // engine and state stored locally, but later state will be stored remotely
   hideCursorTimeoutId: number | undefined;
   difficulty: Difficulty = Difficulty.easy;
+
+  // -- pre-bound event listener callbacks (removing event listeners doesn't work unless you have pre-bound, named functions)
   boundMouseMoveCallback = this.mouseMoveEventListener.bind(this) // named this-bound callback for event listening
+  boundScoreIncreasedCallback = this.scoreIncreasedCallback.bind(this)
+  boundGameOverCallback = this.gameOverCallback.bind(this)
+  boundNewGameCallback = this.newGameCallback.bind(this)
+  boundDiffifcultyChangedCallback = this.difficultyChangedCallback.bind(this)
 
   @property()
   score: number = 0; // declared as property so score gets rerendered when its value changes
@@ -42,27 +48,24 @@ export class SnakeGame extends LitElement {
     /**
      * add event listeners ... can't be removed since being passed anonymously, but don't need to 
      */
-    listenFor(GAME_OVER, () => this.gameOver());
-    listenFor(NEW_GAME, () => this.newGame());
-    listenFor(SCORE_INCREASED, () => this.score++);
-    listenFor(
-      DIFFICULTY_CHANGED,
-      (e: CustomEvent) => (this.difficulty = e.detail.newDifficulty)
-    );
+    listenFor(GAME_OVER, this.boundGameOverCallback);
+    listenFor(NEW_GAME, this.boundNewGameCallback);
+    listenFor(SCORE_INCREASED, this.boundScoreIncreasedCallback);
+    listenFor(DIFFICULTY_CHANGED, this.boundDiffifcultyChangedCallback);
   }
 
   firstUpdated() {
     // access canvas AFTER the page loads so it isn't null
     // draw green square instead of instantiating an entire game engine
-    const context = getCanvas().getContext('2d') as CanvasRenderingContext2D
-    context.beginPath();
-    context.fillStyle = FoodColor.green;
-    context.fillRect(
-      MAP_SIZE/2 * BLOCK_SIZE,
-      MAP_SIZE/2 * BLOCK_SIZE,
-      BLOCK_SIZE,
-      BLOCK_SIZE
-    );
+    // const context = getCanvas().getContext('2d') as CanvasRenderingContext2D
+    // context.beginPath();
+    // context.fillStyle = FoodColor.green;
+    // context.fillRect(
+    //   MAP_SIZE/2 * BLOCK_SIZE,
+    //   MAP_SIZE/2 * BLOCK_SIZE,
+    //   BLOCK_SIZE,
+    //   BLOCK_SIZE
+    // );
   }
 
   /**
@@ -70,18 +73,32 @@ export class SnakeGame extends LitElement {
    */
   disconnectedCallback() {
     super.disconnectedCallback();
-    // window.removeEventListener("load", () => (this.engine = new GameEngine()));
-    // window.removeEventListener(GAME_OVER, () => this.gameOver.bind(this));
-    // window.removeEventListener(NEW_GAME, () => this.newGame.bind(this));
-    window.removeEventListener(SCORE_INCREASED, () => this.score++); // does this actually remove the event? (no)
+    window.removeEventListener(GAME_OVER, this.boundGameOverCallback);
+    window.removeEventListener(NEW_GAME, this.boundNewGameCallback);
+    window.removeEventListener(SCORE_INCREASED, this.boundScoreIncreasedCallback); // does this actually remove the event? (no)
     removeCustomListener(
       DIFFICULTY_CHANGED,
-      (e: CustomEvent) => (this.difficulty = e.detail.newDifficulty)
+      this.boundDiffifcultyChangedCallback
     );
+  }
+
+  // -- NAMED CALLBACKS so we can remove event listeners properly
+  scoreIncreasedCallback(): void {
+    this.score++
+  }
+  gameOverCallback() {
+    this.gameOver()
+  }
+  newGameCallback() {
+    this.newGame()
+  }
+  difficultyChangedCallback(e: CustomEvent) {
+    this.difficulty = e.detail.newDifficulty
   }
 
   newGame() {
     // start new game using this.engine.gameLoop(0)
+    this.hideInstructions("none");
     this.setGameOverVisibility("none");
     this.showScore();
     this.score = 0;
@@ -154,6 +171,14 @@ export class SnakeGame extends LitElement {
     newGameButton!.innerText = "New Game";
   }
 
+  hideInstructions(value: string) {
+    let instructions = document
+      .getElementById("root")
+      ?.shadowRoot?.getElementById("game-component")
+      ?.shadowRoot?.getElementById("instructions");
+    instructions!.style.display = value
+  }
+
   /**
    * Sets score display to block
    */
@@ -172,6 +197,7 @@ export class SnakeGame extends LitElement {
           <h2>Game Over!</h2>
         </div>
       </div>
+      <instructions-component id="instructions" class="instructions"></instructions-component>
       <canvas
         id="snakeCanvas"
         class="canvas"
