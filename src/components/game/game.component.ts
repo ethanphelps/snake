@@ -57,15 +57,15 @@ export class SnakeGame extends LitElement {
   firstUpdated() {
     // access canvas AFTER the page loads so it isn't null
     // draw green square instead of instantiating an entire game engine
-    const context = getCanvas().getContext('2d') as CanvasRenderingContext2D
-    context.beginPath();
-    context.fillStyle = FoodColor.green;
-    context.fillRect(
-      MAP_SIZE/2 * BLOCK_SIZE,
-      MAP_SIZE/2 * BLOCK_SIZE,
-      BLOCK_SIZE,
-      BLOCK_SIZE
-    );
+    // const context = getCanvas().getContext('2d') as CanvasRenderingContext2D
+    // context.beginPath();
+    // context.fillStyle = FoodColor.green;
+    // context.fillRect(
+    //   MAP_SIZE/2 * BLOCK_SIZE,
+    //   MAP_SIZE/2 * BLOCK_SIZE,
+    //   BLOCK_SIZE,
+    //   BLOCK_SIZE
+    // );
   }
 
   /**
@@ -98,6 +98,7 @@ export class SnakeGame extends LitElement {
 
   newGame() {
     // start new game using this.engine.gameLoop(0)
+    this.hideInstructions("none");
     this.setGameOverVisibility("none");
     this.showScore();
     this.score = 0;
@@ -170,6 +171,14 @@ export class SnakeGame extends LitElement {
     newGameButton!.innerText = "New Game";
   }
 
+  hideInstructions(value: string) {
+    let instructions = document
+      .getElementById("root")
+      ?.shadowRoot?.getElementById("game-component")
+      ?.shadowRoot?.getElementById("instructions");
+    instructions!.style.display = value
+  }
+
   /**
    * Sets score display to block
    */
@@ -188,6 +197,7 @@ export class SnakeGame extends LitElement {
           <h2>Game Over!</h2>
         </div>
       </div>
+      <instructions-component id="instructions" class="instructions"></instructions-component>
       <canvas
         id="snakeCanvas"
         class="canvas"

@@ -1,0 +1,39 @@
+@import '../../colors'
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Press+Start+2P&display=swap')
+
+.instructions-container
+  display: flex
+  flex-direction: column
+  justify-content: center
+  align-items: center
+  font-family: 'Press Start 2P' 
+  color: white
+  // height: 500px
+
+.instructions-container p
+  font-size: 13px
+  text-align: center
+  width: 75%
+  line-height: 210%
+  margin-bottom: 35px
+
+.wasd
+  display: grid
+  grid-template-columns:  40px 40px 40px 
+  grid-template-rows: auto
+  row-gap: 15px
+  grid-template-areas:  " .   W   . " " A   S   D " 
+  margin-bottom: 35px
+
+.wasd > *
+  align-self: center
+  justify-self: center
+
+.W 
+  grid-area: W
+.A 
+  grid-area: A
+.S 
+  grid-area: S
+.D 
+  grid-area: D
