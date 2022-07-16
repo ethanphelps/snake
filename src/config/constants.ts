@@ -17,6 +17,7 @@ export const GAME_OVER = "game-over";
 export const SCORE_INCREASED = "score-increased";
 export const NEW_HIGH_SCORE = "new-high-score";
 export const DIFFICULTY_CHANGED = "difficulty-changed"
+export const PAUSE_TOGGLED = "pause-toggled"
 
 // local storage key names
 export const HIGH_SCORE = "snake-high-score";

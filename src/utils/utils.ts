@@ -32,6 +32,8 @@ export const listenFor = (eventName: string, callback: Function): void => {
 
 /**
  * Wrapper for removing a CustomEvent event listner 
+ * Fixes the error: 
+ *    Type 'Event' is missing the following properties from type 'CustomEvent<any>': detail, initCustomEvent
  * @param eventName name of the event to remove a listener for
  * @param callback the function passed to window.addEventListener
  */
