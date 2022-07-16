@@ -1,0 +1,24 @@
+@import '../../colors';
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Press+Start+2P&display=swap');
+
+$offset: 3;
+// $shadows: ($offset $offset 0 $red, $offset $offset 0 $orange, $offset $offset 0 $green);
+
+@mixin text-shadow($shadow...) {
+  -webkit-text-shadow: $shadow;
+     -moz-text-shadow: $shadow;       
+          text-shadow: $shadow;
+}
+
+.container {
+  font-family: 'Press Start 2P' ;
+  color: white;
+  // font-size: 48px
+  @include text-shadow($offset+px $offset+px 0 $red,
+    2*$offset+px 2*$offset+px 0 $orange,
+    3*$offset+px 3*$offset+px 0 $green,
+    4*$offset+px 4*$offset+px 0 $blue,
+    5*$offset+px 5*$offset+px 0 $purple,
+  );
+
+}
