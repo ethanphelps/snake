@@ -9,6 +9,7 @@ import {
   SCORE_INCREASED,
   HIGH_SCORE,
   DIFFICULTY_CHANGED,
+  PAUSE_TOGGLED,
 } from "../../config/constants";
 import {
   broadcastGameUpdate,
@@ -33,6 +34,7 @@ export class SnakeGame extends LitElement {
   boundGameOverCallback = this.gameOverCallback.bind(this)
   boundNewGameCallback = this.newGameCallback.bind(this)
   boundDiffifcultyChangedCallback = this.difficultyChangedCallback.bind(this)
+  boundPauseToggledCallback = this.pauseToggledCallback.bind(this)
 
   @property()
   score: number = 0; // declared as property so score gets rerendered when its value changes
@@ -46,12 +48,13 @@ export class SnakeGame extends LitElement {
     }
 
     /**
-     * add event listeners ... can't be removed since being passed anonymously, but don't need to 
+     * add event listeners ... can't be removed if passed anonymously 
      */
     listenFor(GAME_OVER, this.boundGameOverCallback);
     listenFor(NEW_GAME, this.boundNewGameCallback);
     listenFor(SCORE_INCREASED, this.boundScoreIncreasedCallback);
     listenFor(DIFFICULTY_CHANGED, this.boundDiffifcultyChangedCallback);
+    listenFor(PAUSE_TOGGLED, this.boundPauseToggledCallback);
   }
 
   firstUpdated() {
@@ -70,6 +73,8 @@ export class SnakeGame extends LitElement {
 
   /**
    * This function has references to this.engine, which could be causing the old engines to not be garbage collected
+   * removeCustomListener fixes the error: 
+   *      Type 'Event' is missing the following properties from type 'CustomEvent<any>': detail, initCustomEvent
    */
   disconnectedCallback() {
     super.disconnectedCallback();
@@ -80,6 +85,7 @@ export class SnakeGame extends LitElement {
       DIFFICULTY_CHANGED,
       this.boundDiffifcultyChangedCallback
     );
+    removeCustomListener(PAUSE_TOGGLED, this.boundPauseToggledCallback)
   }
 
   // -- NAMED CALLBACKS so we can remove event listeners properly
@@ -94,6 +100,14 @@ export class SnakeGame extends LitElement {
   }
   difficultyChangedCallback(e: CustomEvent) {
     this.difficulty = e.detail.newDifficulty
+  }
+  pauseToggledCallback(e: CustomEvent) {
+    console.log("toggle paused received")
+    if(e.detail.paused) {
+      this.setPausedVisibility("block")    
+    } else {
+      this.setPausedVisibility("none")
+    }
   }
 
   newGame() {
@@ -171,6 +185,14 @@ export class SnakeGame extends LitElement {
     newGameButton!.innerText = "New Game";
   }
 
+  setPausedVisibility(value: string) {
+    let gameOverText = document
+      .getElementById("root")
+      ?.shadowRoot?.getElementById("game-component")
+      ?.shadowRoot?.getElementById("paused-text");
+    gameOverText!.style.display = value;
+  }
+
   hideInstructions(value: string) {
     let instructions = document
       .getElementById("root")
@@ -195,6 +217,9 @@ export class SnakeGame extends LitElement {
       <div class="game-over-container">
         <div id="game-over-text" class="game-over-text">
           <h2>Game Over!</h2>
+        </div>
+        <div id="paused-text" class="paused-text">
+          <h2>Paused</h2>
         </div>
       </div>
       <instructions-component id="instructions" class="instructions"></instructions-component>

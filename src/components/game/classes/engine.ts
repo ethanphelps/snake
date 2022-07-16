@@ -5,6 +5,7 @@ import {
   SCORE_INCREASED,
   GAME_OVER,
   SNAKE_SPEEDS,
+  PAUSE_TOGGLED,
 } from "../../../config/constants";
 import { FoodColor, Difficulty } from "../../../models/enums";
 import Food from "./food";
@@ -205,6 +206,7 @@ export class GameEngine {
    */
   togglePause(): void {
     this.paused = !this.paused;
+    broadcastGameUpdate(PAUSE_TOGGLED, { paused: this.paused})
     if (!this.paused) {
       this.lastestRenderTimestamp = performance.now();
       this.gameLoop(performance.now());
