@@ -10,12 +10,12 @@ export class HighScore extends LitElement {
     return html`
       <div class="container">
         <h1>
-          <span class="">HIGH SCORE</span> 
-          <span class="red">HIGH SCORE</span> 
-          <span class="orange">HIGH SCORE</span> 
-          <span class="green">HIGH SCORE</span> 
-          <span class="blue">HIGH SCORE</span> 
-          <span class="purple">HIGH SCORE</span> 
+          <span>HIGH SCORE</span> 
+          <span>HIGH SCORE</span> 
+          <span>HIGH SCORE</span> 
+          <span>HIGH SCORE</span> 
+          <span>HIGH SCORE</span> 
+          <span>HIGH SCORE</span> 
         </h1>
       </div>
     `
