@@ -1,0 +1,86 @@
+@import "../../colors";
+@import url("https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Press+Start+2P&display=swap");
+
+$offset: 6; // distance in px between layers
+$num-layers: 6; // number of high score layers
+$num-letters: 9;
+$radius: 9px; // distance of animation
+$speed: 0.53s; // speed fo animation
+$color-list: $white, $red, $orange, $green, $blue, $purple;
+
+// iterate over siblings and increasingly offset them by $amount px
+// also adding colors (iterating in reverse with nth-last-child so front element is rendered on top)
+@mixin coloredLayers($amount) {
+  // iterate layers in reverse
+  @for $i from 1 through $num-layers {
+    // & targets span with layer class and :nth-last-child gets nth layer from end
+    &:nth-last-child(#{$i}) {
+      left: $i*$amount+px;
+      color: nth($color-list, $i);
+    }
+  }
+}
+
+// to make animation wavy, the animation delay needs to accumulate over each LETTER/LAYER
+// iteration. if the delay resets at each letter, each layer's letters will move in synchrony
+@mixin wavy-layered-letters() {
+  $delay: 0;
+  // iterate once over each letter
+  @for $j from 1 through $num-letters {
+    // for each letter, iterate over all layers
+    @for $i from 1 through $num-layers {
+        // get letter j of layer i from end
+        &:nth-last-child(#{$i}) > span:nth-child(#{$j}) {
+            animation: movelayers $speed ease-in-out infinite;
+            animation-delay: calc($delay) + s;
+        }
+        // increment delay for next letter/layer combo
+        $delay: $delay + calc(1/10);
+    }
+  }
+
+  // position is relative so animate by transform instead of interpolating 'top' attribute
+  @keyframes movelayers {
+    0% { top: 0; } 
+    // 50% { top: $radius; } 
+    50% { transform: translate(0, $radius);} 
+    100% { top: 0; } 
+  }
+}
+
+@mixin flex-centered() {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  font-family: "Press Start 2P";
+  color: white;
+  position: relative;
+  width: 400px;
+}
+
+.layer {
+  text-align: center;
+  position: absolute;
+  @include flex-centered();
+
+  // init values so animation knows how to animate
+  right: 0;
+  top: 0;
+
+  // assigns colors, offsets and delayed animations to all layers
+  @include coloredLayers($offset);
+  @include wavy-layered-letters();
+
+  // add spacing between words 
+  .end-word {
+    margin-right: 25px; 
+  }
+
+  // add spacing between letters
+  span {
+    margin-right: 2px;
+  }
+}

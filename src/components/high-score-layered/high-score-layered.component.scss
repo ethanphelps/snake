@@ -8,18 +8,19 @@ $speed: 0.75s; // speed fo animation
 $color-list: $white, $red, $orange, $green, $blue, $purple;
 // $shadows: ($offset $offset 0 $red, $offset $offset 0 $orange, $offset $offset 0 $green);
 
-// can take a list of shadows and output a single shadow style
+// (not used for this component) can take a list of shadows and output a single shadow style
 @mixin text-shadow($shadow...) {
   -webkit-text-shadow: $shadow;
   -moz-text-shadow: $shadow;
   text-shadow: $shadow;
 }
 
-// iterate over siblings and increasingly offset them by $amount px
+// iterate over layers and increasingly offset them by $amount px
 // also adding colors (iterating in reverse with nth-last-child so front element is rendered on top)
 // create animations for each layer and delay them 
 @mixin offsetAnimation($amount) {
   @for $i from 1 through $num-layers {
+    // targets span i from the end
     &:nth-last-child(#{$i}) {
       // top: $i*$amount+px;
       left: $i*$amount+px;
@@ -31,6 +32,7 @@ $color-list: $white, $red, $orange, $green, $blue, $purple;
     }
   }
 
+  // animating top attribute since spans are position: absolute
   @keyframes movelayers {
     0% { top: 0; } 
     50% { top: $radius; } 
@@ -42,7 +44,6 @@ $color-list: $white, $red, $orange, $green, $blue, $purple;
   font-family: "Press Start 2P";
   color: white;
   position: relative;
-  // border: solid 2px white;
   width: 400px;
 }
 
