@@ -15,7 +15,7 @@ import {
   broadcastGameUpdate,
   listenFor,
   removeCustomListener,
-  getCanvas
+  getCanvas,
 } from "../../utils/utils";
 import gameStyles from "./game.component.sass";
 import { GameEngine } from "./classes/engine";
@@ -29,12 +29,13 @@ export class SnakeGame extends LitElement {
   difficulty: Difficulty = Difficulty.easy;
 
   // -- pre-bound event listener callbacks (removing event listeners doesn't work unless you have pre-bound, named functions)
-  boundMouseMoveCallback = this.mouseMoveEventListener.bind(this) // named this-bound callback for event listening
-  boundScoreIncreasedCallback = this.scoreIncreasedCallback.bind(this)
-  boundGameOverCallback = this.gameOverCallback.bind(this)
-  boundNewGameCallback = this.newGameCallback.bind(this)
-  boundDiffifcultyChangedCallback = this.difficultyChangedCallback.bind(this)
-  boundPauseToggledCallback = this.pauseToggledCallback.bind(this)
+  boundMouseMoveCallback = this.mouseMoveEventListener.bind(this); // named this-bound callback for event listening
+  boundScoreIncreasedCallback = this.scoreIncreasedCallback.bind(this);
+  boundGameOverCallback = this.gameOverCallback.bind(this);
+  boundNewGameCallback = this.newGameCallback.bind(this);
+  boundDiffifcultyChangedCallback = this.difficultyChangedCallback.bind(this);
+  boundPauseToggledCallback = this.pauseToggledCallback.bind(this);
+  boundHighScoreCallback = this.highScoreCallback.bind(this);
 
   @property()
   score: number = 0; // declared as property so score gets rerendered when its value changes
@@ -48,13 +49,14 @@ export class SnakeGame extends LitElement {
     }
 
     /**
-     * add event listeners ... can't be removed if passed anonymously 
+     * add event listeners ... can't be removed if passed anonymously
      */
     listenFor(GAME_OVER, this.boundGameOverCallback);
     listenFor(NEW_GAME, this.boundNewGameCallback);
     listenFor(SCORE_INCREASED, this.boundScoreIncreasedCallback);
     listenFor(DIFFICULTY_CHANGED, this.boundDiffifcultyChangedCallback);
     listenFor(PAUSE_TOGGLED, this.boundPauseToggledCallback);
+    listenFor(NEW_HIGH_SCORE, this.boundHighScoreCallback);
   }
 
   firstUpdated() {
@@ -73,47 +75,55 @@ export class SnakeGame extends LitElement {
 
   /**
    * This function has references to this.engine, which could be causing the old engines to not be garbage collected
-   * removeCustomListener fixes the error: 
+   * removeCustomListener fixes the error:
    *      Type 'Event' is missing the following properties from type 'CustomEvent<any>': detail, initCustomEvent
    */
   disconnectedCallback() {
     super.disconnectedCallback();
     window.removeEventListener(GAME_OVER, this.boundGameOverCallback);
     window.removeEventListener(NEW_GAME, this.boundNewGameCallback);
-    window.removeEventListener(SCORE_INCREASED, this.boundScoreIncreasedCallback); // does this actually remove the event? (no)
+    window.removeEventListener(
+      SCORE_INCREASED,
+      this.boundScoreIncreasedCallback
+    ); // does this actually remove the event? (no)
     removeCustomListener(
       DIFFICULTY_CHANGED,
       this.boundDiffifcultyChangedCallback
     );
-    removeCustomListener(PAUSE_TOGGLED, this.boundPauseToggledCallback)
+    removeCustomListener(PAUSE_TOGGLED, this.boundPauseToggledCallback);
+    window.removeEventListener(NEW_HIGH_SCORE, this.boundHighScoreCallback); // does this actually remove the event? (no)
   }
 
   // -- NAMED CALLBACKS so we can remove event listeners properly
   scoreIncreasedCallback(): void {
-    this.score++
+    this.score++;
   }
   gameOverCallback() {
-    this.gameOver()
+    this.gameOver();
   }
   newGameCallback() {
-    this.newGame()
+    this.newGame();
   }
   difficultyChangedCallback(e: CustomEvent) {
-    this.difficulty = e.detail.newDifficulty
+    this.difficulty = e.detail.newDifficulty;
   }
   pauseToggledCallback(e: CustomEvent) {
-    console.log("toggle paused received")
-    if(e.detail.paused) {
-      this.setPausedVisibility("block")    
+    console.log("toggle paused received");
+    if (e.detail.paused) {
+      this.setPausedVisibility("block");
     } else {
-      this.setPausedVisibility("none")
+      this.setPausedVisibility("none");
     }
+  }
+  highScoreCallback() {
+    this.setHighScoreVisibility("block");
   }
 
   newGame() {
     // start new game using this.engine.gameLoop(0)
     this.hideInstructions("none");
     this.setGameOverVisibility("none");
+    this.setHighScoreVisibility("none");
     this.showScore();
     this.score = 0;
     this.engine = new GameEngine(this.difficulty);
@@ -124,33 +134,36 @@ export class SnakeGame extends LitElement {
 
   // short delay to avoid mouse reappearing if hand bumps mouse while clicking
   hideMouseAfterIdle() {
-    setTimeout(() => window.addEventListener('mousemove', this.boundMouseMoveCallback), 500);
+    setTimeout(
+      () => window.addEventListener("mousemove", this.boundMouseMoveCallback),
+      500
+    );
   }
 
   /**
-   *  disables mouse hiding feature. called after game over event 
+   *  disables mouse hiding feature. called after game over event
    */
   disableHideMouseAfterIdle() {
     window.clearTimeout(this.hideCursorTimeoutId); // remove hide cursor timer
-    window.removeEventListener('mousemove', this.boundMouseMoveCallback)
+    window.removeEventListener("mousemove", this.boundMouseMoveCallback);
   }
 
   /**
-   * event listener passed to document.onmousemove to display the mouse again if moved, but hide 
+   * event listener passed to document.onmousemove to display the mouse again if moved, but hide
    * again if idle for 2 seconds
    */
   mouseMoveEventListener() {
     // don't want to fire a bunch of the same event
-    window.removeEventListener('mousemove', this.boundMouseMoveCallback)
+    window.removeEventListener("mousemove", this.boundMouseMoveCallback);
     // function to be called after 2 seconds of idle mouse
     const hideCursor = () => {
       window.clearTimeout(this.hideCursorTimeoutId); // don't want timer to keep going off after cursor hidden
       document.body.style.cursor = "none";
-      window.addEventListener('mousemove', this.boundMouseMoveCallback) // listen for mouse move again
+      window.addEventListener("mousemove", this.boundMouseMoveCallback); // listen for mouse move again
     };
     // show the mouse and start timer to hide again after 2 seconds
     document.body.style.cursor = "default";
-    this.hideCursorTimeoutId = window.setTimeout(hideCursor, 2000); 
+    this.hideCursorTimeoutId = window.setTimeout(hideCursor, 2000);
   }
 
   /**
@@ -158,7 +171,6 @@ export class SnakeGame extends LitElement {
    * new high score event if applicable
    */
   gameOver() {
-    this.setGameOverVisibility("block");
     document.body.style.cursor = "default";
     this.disableHideMouseAfterIdle();
 
@@ -166,9 +178,12 @@ export class SnakeGame extends LitElement {
     if (this.score > Number(localStorage.getItem(HIGH_SCORE))) {
       localStorage.setItem(HIGH_SCORE, this.score.toString());
       broadcastGameUpdate(NEW_HIGH_SCORE);
+      this.setNewGameVisibility("block");
+    } else {
+      this.setGameOverVisibility("block");
     }
 
-    delete this.engine
+    delete this.engine;
   }
 
   setGameOverVisibility(value: string) {
@@ -176,11 +191,15 @@ export class SnakeGame extends LitElement {
       .getElementById("root")
       ?.shadowRoot?.getElementById("game-component")
       ?.shadowRoot?.getElementById("game-over-text");
+    gameOverText!.style.display = value;
+    this.setNewGameVisibility(value);
+  }
+
+  setNewGameVisibility(value: string) {
     let newGameButton = document
       .getElementById("root")
       ?.shadowRoot?.getElementById("game-component")
       ?.shadowRoot?.getElementById("new-game-button");
-    gameOverText!.style.display = value;
     newGameButton!.style.display = value;
     newGameButton!.innerText = "New Game";
   }
@@ -193,12 +212,20 @@ export class SnakeGame extends LitElement {
     gameOverText!.style.display = value;
   }
 
+  setHighScoreVisibility(value: string) {
+    let highScoreComponent = document
+      .getElementById("root")
+      ?.shadowRoot?.getElementById("game-component")
+      ?.shadowRoot?.getElementById("new-high-score");
+    highScoreComponent!.style.display = value;
+  }
+
   hideInstructions(value: string) {
     let instructions = document
       .getElementById("root")
       ?.shadowRoot?.getElementById("game-component")
       ?.shadowRoot?.getElementById("instructions");
-    instructions!.style.display = value
+    instructions!.style.display = value;
   }
 
   /**
@@ -215,7 +242,10 @@ export class SnakeGame extends LitElement {
   protected render(): TemplateResult {
     return html`
       <div class="game-over-container">
-        <high-score-component id="new-high-score" class="new-high-score"></high-score-component>
+        <high-score-component
+          id="new-high-score"
+          class="new-high-score"
+        ></high-score-component>
         <div id="game-over-text" class="game-over-text">
           <h2>Game Over!</h2>
         </div>
@@ -223,7 +253,10 @@ export class SnakeGame extends LitElement {
           <h2>Paused</h2>
         </div>
       </div>
-      <instructions-component id="instructions" class="instructions"></instructions-component>
+      <instructions-component
+        id="instructions"
+        class="instructions"
+      ></instructions-component>
       <canvas
         id="snakeCanvas"
         class="canvas"
