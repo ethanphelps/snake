@@ -9,7 +9,14 @@ export class HighScore extends LitElement {
   render(): TemplateResult {
     return html`
       <div class="container">
-        <h1>HIGH SCORE</h1>
+        <h1>
+          <span class="">HIGH SCORE</span> 
+          <span class="red">HIGH SCORE</span> 
+          <span class="orange">HIGH SCORE</span> 
+          <span class="green">HIGH SCORE</span> 
+          <span class="blue">HIGH SCORE</span> 
+          <span class="purple">HIGH SCORE</span> 
+        </h1>
       </div>
     `
   }
