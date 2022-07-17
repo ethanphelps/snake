@@ -1,0 +1,71 @@
+@import "../../colors";
+@import url("https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Press+Start+2P&display=swap");
+
+$offset: 8; // distance in px between layers
+$num-layers: 6; // number of high score layers
+$radius: 20px; // distance of animation
+$speed: 0.75s; // speed fo animation
+$color-list: $white, $red, $orange, $green, $blue, $purple;
+// $shadows: ($offset $offset 0 $red, $offset $offset 0 $orange, $offset $offset 0 $green);
+
+// can take a list of shadows and output a single shadow style
+@mixin text-shadow($shadow...) {
+  -webkit-text-shadow: $shadow;
+  -moz-text-shadow: $shadow;
+  text-shadow: $shadow;
+}
+
+// iterate over siblings and increasingly offset them by $amount px
+// also adding colors (iterating in reverse with nth-last-child so front element is rendered on top)
+// create animations for each layer and delay them 
+@mixin offsetAnimation($amount) {
+  @for $i from 1 through $num-layers {
+    &:nth-last-child(#{$i}) {
+      // top: $i*$amount+px;
+      left: $i*$amount+px;
+      color: nth($color-list, $i);
+
+      // add animation to each layer with different delays
+      animation: movelayers $speed ease-in-out infinite;
+      animation-delay: calc($i/10) + s;
+    }
+  }
+
+  @keyframes movelayers {
+    0% { top: 0; } 
+    50% { top: $radius; } 
+    100% { top: 0; } 
+  }
+}
+
+.container {
+  font-family: "Press Start 2P";
+  color: white;
+  position: relative;
+  // border: solid 2px white;
+  width: 400px;
+}
+
+.container span {
+  text-align: center;
+  position: absolute;
+  // init values so animation knows how to animate
+  right: 0;
+  top: 0;
+  // assigns colors, offsets and delayed animations to all layers
+  @include offsetAnimation($offset);
+}
+
+/* old static text-shadow layers */
+// .container {
+//   font-family: "Press Start 2P";
+//   color: white;
+//   // font-size: 48px
+//   @include text-shadow(
+//     $offset + px $offset + px 0 $red,
+//     2 * $offset + px 2 * $offset + px 0 $orange,
+//     3 * $offset + px 3 * $offset + px 0 $green,
+//     4 * $offset + px 4 * $offset + px 0 $blue,
+//     5 * $offset + px 5 * $offset + px 0 $purple
+//   );
+// }
