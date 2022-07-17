@@ -7,32 +7,18 @@ $num-letters: 9;
 $radius: 9px; // distance of animation
 $speed: 0.53s; // speed fo animation
 $color-list: $white, $red, $orange, $green, $blue, $purple;
-// $shadows: ($offset $offset 0 $red, $offset $offset 0 $orange, $offset $offset 0 $green);
-
-// can take a list of shadows and output a single shadow style
-@mixin text-shadow($shadow...) {
-  -webkit-text-shadow: $shadow;
-  -moz-text-shadow: $shadow;
-  text-shadow: $shadow;
-}
 
 // iterate over siblings and increasingly offset them by $amount px
 // also adding colors (iterating in reverse with nth-last-child so front element is rendered on top)
-// create animations for each layer and delay them 
 @mixin coloredLayers($amount) {
-  // outer loop iterating letter by letter, adding $j/10 delay each letter
-    // iterate layers in reverse
-    @for $i from 1 through $num-layers {
-      // & targets h1 and :nth-last-child gets nth layer from end
-      &:nth-last-child(#{$i}) {
-        // top: $i*$amount+px;
-        left: $i*$amount+px;
-        color: nth($color-list, $i);
-
-      }
+  // iterate layers in reverse
+  @for $i from 1 through $num-layers {
+    // & targets span with layer class and :nth-last-child gets nth layer from end
+    &:nth-last-child(#{$i}) {
+      left: $i*$amount+px;
+      color: nth($color-list, $i);
     }
-
-
+  }
 }
 
 // to make animation wavy, the animation delay needs to accumulate over each LETTER/LAYER
@@ -43,23 +29,17 @@ $color-list: $white, $red, $orange, $green, $blue, $purple;
   @for $j from 1 through $num-letters {
     // for each letter, iterate over all layers
     @for $i from 1 through $num-layers {
-        // get letter j of layer i
+        // get letter j of layer i from end
         &:nth-last-child(#{$i}) > span:nth-child(#{$j}) {
-
-          // select letter j
-          
-            // animation-delay: calc($j/10) + s;
             animation: movelayers $speed ease-in-out infinite;
-            // animation-delay: (/*calc($i/10) +*/ calc($j/10)) + s;
             animation-delay: calc($delay) + s;
-          
-          // add animation to each layer with different delays
         }
-        // increment delay for next letter/layer
+        // increment delay for next letter/layer combo
         $delay: $delay + calc(1/10);
     }
   }
 
+  // position is relative so animate by transform instead of interpolating 'top' attribute
   @keyframes movelayers {
     0% { top: 0; } 
     // 50% { top: $radius; } 
@@ -81,10 +61,6 @@ $color-list: $white, $red, $orange, $green, $blue, $purple;
   width: 400px;
 }
 
-// .container > h1 > span {
-//   @include wavy-layered-letters();
-// }
-
 .layer {
   text-align: center;
   position: absolute;
@@ -97,30 +73,14 @@ $color-list: $white, $red, $orange, $green, $blue, $purple;
   // assigns colors, offsets and delayed animations to all layers
   @include coloredLayers($offset);
   @include wavy-layered-letters();
-  // remove add spacing between words and center
+
+  // add spacing between words 
   .end-word {
-    // @include flex-centered();
     margin-right: 25px; 
   }
 
+  // add spacing between letters
   span {
-    top: 0;
     margin-right: 2px;
-    // position: absolute;
   }
 }
-
-
-/* old static text-shadow layers */
-// .container {
-//   font-family: "Press Start 2P";
-//   color: white;
-//   // font-size: 48px
-//   @include text-shadow(
-//     $offset + px $offset + px 0 $red,
-//     2 * $offset + px 2 * $offset + px 0 $orange,
-//     3 * $offset + px 3 * $offset + px 0 $green,
-//     4 * $offset + px 4 * $offset + px 0 $blue,
-//     5 * $offset + px 5 * $offset + px 0 $purple
-//   );
-// }

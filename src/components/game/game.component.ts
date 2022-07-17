@@ -242,10 +242,10 @@ export class SnakeGame extends LitElement {
   protected render(): TemplateResult {
     return html`
       <div class="game-over-container">
-        <high-score-component
+        <high-score-wavy
           id="new-high-score"
           class="new-high-score"
-        ></high-score-component>
+        ></high-score-wavy>
         <div id="game-over-text" class="game-over-text">
           <h2>Game Over!</h2>
         </div>
