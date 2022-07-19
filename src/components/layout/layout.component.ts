@@ -3,6 +3,7 @@ import {
 } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import layoutStyles from './layout.component.sass'
+import GithubLogo from '../../assets/images/github-logo.png';
 
 
 @customElement('layout-component')
@@ -20,7 +21,7 @@ export class Layout extends LitElement {
         </section>
         <section class="footer-container">
          <a href="https://github.com/ethanphelps/snake">
-         <img src="src/assets/images/GitHub-Mark-Light-64px.png" alt="github logo"  class="github-logo"> 
+         <img src=${GithubLogo} alt="github logo"  class="github-logo"> 
          <!-- <img src="../../assets/images/GitHub-Mark-Light-64px.png" alt="github logo"  class="github-logo">  -->
          <p class="made-by">made by ethan phelps</p> 
         </a> 
