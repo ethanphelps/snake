@@ -1,6 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = (env, argv) => ({
   mode: "development",
@@ -16,7 +17,9 @@ module.exports = (env, argv) => ({
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: "./src/index.html",
+      filename: "snake"
     }),
+    new TerserPlugin()
   ],
   output: {
     filename: "[name].bundle.js",

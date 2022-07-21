@@ -1,5 +1,5 @@
 # snake
-This is a snake implementation I'm making for fun to get experience with Typescript, Web Components and HTML Canvas. It's built using Lit Element web components and has a simple typescript game "engine" that runs and draws the game onto the HTML Canvas.
+This is a snake implementation I'm making from scratch to get experience with Typescript, Web Components, SCSS and HTML Canvas. It's built using Lit Element web components and has a simple typescript game class that runs and draws the game onto the HTML Canvas. I use the native browser EventTarget API to handle events and propagating state to upstream UI components. There is no game development framework used here, everything's from scratch. 
 
 A live version of the game is deployed at [ethanphelps.dev/snake](https://ethanphelps.dev/snake)
 
